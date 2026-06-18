@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 
 const initialTasks = [
@@ -74,9 +74,15 @@ const initialTasks = [
     subtasks: [],
   },
 ];
+// Klucz do localStorage dla zadań - można rozszerzyć o datę, by mieć osobne dane na każdy dzień
+const TASKS_STORAGE_KEY = "rotate.tasks.v1";
 
 function App() {
-  const [tasks, setTasks] = useState(initialTasks);
+  const [tasks, setTasks] = useState(() => {
+    const storedTasks = localStorage.getItem(TASKS_STORAGE_KEY);
+      return storedTasks ? JSON.parse(storedTasks) : initialTasks;
+  });
+  
   const [activeIndex, setActiveIndex] = useState(0);
   const [showSubWheel, setShowSubWheel] = useState(false);
 
@@ -84,6 +90,11 @@ function App() {
 
   const completedTasks = tasks.filter((task) => task.done).length;
   const progress = Math.round((completedTasks / tasks.length) * 100);
+
+  useEffect(() => {
+    localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(tasks));
+  }, [tasks]);
+
 
   function finishTask() {
     setTasks((prevTasks) =>
