@@ -251,7 +251,7 @@ button {
 /* PROGRESS */
 
 .progress-card {
-  position: absolute;
+  /* position: absolute; */
   left: 32px;
   bottom: 32px;
   width: 230px;
