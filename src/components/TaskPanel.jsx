@@ -16,7 +16,10 @@ function TaskPanel({
 
   // Licznik czasu sesji
   useEffect(() => {
-    if (!sessionStartTime) return;
+    if (!sessionStartTime) {
+      setElapsedTime(0);
+      return;
+    }
 
     const interval = setInterval(() => {
       const now = new Date();

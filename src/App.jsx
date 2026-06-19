@@ -1,9 +1,15 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import TaskPanel from "./components/TaskPanel";
 import TaskWheel from "./components/TaskWheel";
 import SubtaskWheel from "./components/SubtaskWheel";
 import { initialTasks } from "./data/initialTasks";
-import { loadTasks, saveTasks } from "./utils/taskStorage";
+import {
+  loadTasks,
+  saveTasks,
+  loadRunningSession,
+  saveRunningSession,
+  clearRunningSession,
+} from "./utils/taskStorage";
 import {
   createSession,
   endSession,
@@ -20,46 +26,103 @@ const getLocalDateKey = (date) => {
 };
 
 function App() {
-  const [tasks, setTasks] = useState(() => loadTasks(initialTasks));
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [bootstrap] = useState(() => {
+    const initialTasksState = loadTasks(initialTasks);
+    const storedRunningSession = loadRunningSession();
+
+    const isStoredSessionValid = storedRunningSession
+      ? initialTasksState.some(
+          (task) => task.id === storedRunningSession.taskId && !task.done
+        )
+      : false;
+
+    const resolvedRunningSession = isStoredSessionValid
+      ? storedRunningSession
+      : null;
+
+    const resolvedActiveIndex = resolvedRunningSession
+      ? initialTasksState.findIndex(
+          (task) => task.id === resolvedRunningSession.taskId && !task.done
+        )
+      : initialTasksState.findIndex((task) => !task.done);
+
+    const safeActiveIndex = resolvedActiveIndex >= 0 ? resolvedActiveIndex : 0;
+    const defaultTask = initialTasksState[safeActiveIndex];
+
+    const createdRunningSession =
+      resolvedRunningSession || (defaultTask && !defaultTask.done
+        ? {
+            taskId: defaultTask.id,
+            startTime: createSession(new Date()).startTime,
+          }
+        : null);
+
+    return {
+      initialTasksState,
+      initialActiveIndex: safeActiveIndex,
+      initialRunningSession: createdRunningSession,
+      initialSessionStartTime: createdRunningSession
+        ? new Date(createdRunningSession.startTime)
+        : new Date(),
+    };
+  });
+
+  const [tasks, setTasks] = useState(bootstrap.initialTasksState);
+  const [activeIndex, setActiveIndex] = useState(bootstrap.initialActiveIndex);
   const [showSubWheel, setShowSubWheel] = useState(false);
-  const [sessionStartTime, setSessionStartTime] = useState(new Date());
-  const previousIndexRef = useRef(0);
-  const sessionStartTimeRef = useRef(new Date());
+  const [runningSession, setRunningSession] = useState(
+    bootstrap.initialRunningSession
+  );
+  const [sessionStartTime, setSessionStartTime] = useState(
+    bootstrap.initialSessionStartTime
+  );
 
   useEffect(() => {
     saveTasks(tasks);
   }, [tasks]);
 
-  // Zapisz sesję gdy zmienia się zadanie
   useEffect(() => {
-    if (tasks.length === 0 || activeIndex >= tasks.length) {
+    if (runningSession) {
+      saveRunningSession(runningSession);
       return;
     }
 
-    // Jeśli zmienił się task - zapisz sesję poprzedniego
-    if (previousIndexRef.current !== activeIndex && previousIndexRef.current < tasks.length) {
-      const previousIndex = previousIndexRef.current;
-      const previousSessionStart = sessionStartTimeRef.current;
+    clearRunningSession();
+  }, [runningSession]);
 
-      setTasks((prevTasks) => {
-        const startedSession = createSession(previousSessionStart);
-        const completedSession = endSession(startedSession, new Date());
-
-        return prevTasks.map((task, index) => {
-          if (index === previousIndex) {
-            return addSessionToTask(task, completedSession);
-          }
-          return task;
-        });
-      });
+  const stopRunningSession = (endedAt) => {
+    if (!runningSession) {
+      return;
     }
 
-    // Zapamiętaj obecny index i resetuj timer
-    previousIndexRef.current = activeIndex;
-    sessionStartTimeRef.current = new Date();
-    setSessionStartTime(new Date());
-  }, [activeIndex, tasks.length]);
+    setTasks((prevTasks) => {
+      const taskIndex = prevTasks.findIndex((task) => task.id === runningSession.taskId);
+      if (taskIndex === -1) {
+        return prevTasks;
+      }
+
+      const startedSession = createSession(new Date(runningSession.startTime));
+      const completedSession = endSession(startedSession, endedAt);
+
+      return prevTasks.map((task, index) =>
+        index === taskIndex ? addSessionToTask(task, completedSession) : task
+      );
+    });
+
+    setRunningSession(null);
+    clearRunningSession();
+  };
+
+  const startRunningSessionForTask = (taskId, startedAt) => {
+    const startedSession = createSession(startedAt);
+    const nextRunningSession = {
+      taskId,
+      startTime: startedSession.startTime,
+    };
+
+    setRunningSession(nextRunningSession);
+    setSessionStartTime(startedAt);
+  };
 
   const activeTask = tasks[activeIndex] ?? null;
   const completedTasks = tasks.filter((task) => task.done).length;
@@ -75,10 +138,35 @@ function App() {
     ? getDailyDuration(activeTask, today)
     : 0;
 
+  const selectTask = (nextIndex) => {
+    if (nextIndex === activeIndex || nextIndex < 0 || nextIndex >= tasks.length) {
+      return;
+    }
+
+    const now = new Date();
+    if (runningSession) {
+      stopRunningSession(now);
+    }
+
+    setActiveIndex(nextIndex);
+
+    const nextTask = tasks[nextIndex];
+    if (nextTask && !nextTask.done) {
+      startRunningSessionForTask(nextTask.id, now);
+    }
+  };
+
   function finishTask() {
     if (!activeTask) {
       return;
     }
+
+    const now = new Date();
+    if (runningSession && runningSession.taskId === activeTask.id) {
+      stopRunningSession(now);
+    }
+
+    setSessionStartTime(null);
 
     setTasks((prevTasks) =>
       prevTasks.map((task, index) =>
@@ -90,7 +178,8 @@ function App() {
 
     setActiveIndex((prevIndex) => {
       const nextIndex = prevIndex + 1;
-      return nextIndex >= tasks.length ? 0 : nextIndex;
+      const normalizedIndex = nextIndex >= tasks.length ? 0 : nextIndex;
+      return normalizedIndex;
     });
   }
 
@@ -160,7 +249,7 @@ function App() {
             <TaskWheel
               tasks={tasks}
               activeIndex={activeIndex}
-              setActiveIndex={setActiveIndex}
+              setActiveIndex={selectTask}
             />
 
             <div className="progress-card">

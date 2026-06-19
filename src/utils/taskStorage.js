@@ -1,4 +1,5 @@
 export const TASKS_STORAGE_KEY = "rotate.tasks.v1";
+export const RUNNING_SESSION_STORAGE_KEY = "rotate.running-session.v1";
 
 export function loadTasks(fallbackTasks) {
   try {
@@ -16,4 +17,30 @@ export function loadTasks(fallbackTasks) {
 
 export function saveTasks(tasks) {
   localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(tasks));
+}
+
+export function loadRunningSession() {
+  try {
+    const storedSession = localStorage.getItem(RUNNING_SESSION_STORAGE_KEY);
+    if (!storedSession) {
+      return null;
+    }
+
+    const parsedSession = JSON.parse(storedSession);
+    if (!parsedSession || !parsedSession.taskId || !parsedSession.startTime) {
+      return null;
+    }
+
+    return parsedSession;
+  } catch {
+    return null;
+  }
+}
+
+export function saveRunningSession(session) {
+  localStorage.setItem(RUNNING_SESSION_STORAGE_KEY, JSON.stringify(session));
+}
+
+export function clearRunningSession() {
+  localStorage.removeItem(RUNNING_SESSION_STORAGE_KEY);
 }
