@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import TaskPanel from "./components/TaskPanel";
+import StatsPanel from "./components/StatsPanel";
 import TaskWheel from "./components/TaskWheel";
 import SubtaskWheel from "./components/SubtaskWheel";
 import { initialTasks } from "./data/initialTasks";
@@ -16,6 +17,7 @@ import {
   endSession,
   addSessionToTask,
   getDailyDuration,
+  getDailySessions,
   getDailySubtaskDuration,
   getTargetSeconds,
   getTimeProgressPercent,
@@ -231,6 +233,39 @@ function App() {
     const taskProgress = taskProgressById[task.id];
     return sum + Math.min(taskProgress.spentSeconds, taskProgress.targetSeconds);
   }, 0);
+  const totalSpentSeconds = visibleTasks.reduce((sum, task) => {
+    const taskProgress = taskProgressById[task.id];
+    return sum + taskProgress.spentSeconds;
+  }, 0);
+  const remainingSeconds = visibleTasks.reduce((sum, task) => {
+    const taskProgress = taskProgressById[task.id];
+    return sum + Math.max(taskProgress.targetSeconds - taskProgress.spentSeconds, 0);
+  }, 0);
+  const overTargetSeconds = visibleTasks.reduce((sum, task) => {
+    const taskProgress = taskProgressById[task.id];
+    return sum + Math.max(taskProgress.spentSeconds - taskProgress.targetSeconds, 0);
+  }, 0);
+  const taskStats = visibleTasks
+    .map((task) => ({
+      id: task.id,
+      title: task.title,
+      icon: task.icon,
+      ...taskProgressById[task.id],
+    }))
+    .sort((a, b) => b.spentSeconds - a.spentSeconds);
+  const todaySessionCount =
+    getDailySessions(visibleTasks, today).length + (runningSession ? 1 : 0);
+  const stats = {
+    spentSeconds: totalSpentSeconds,
+    targetSeconds: totalTargetSeconds,
+    remainingSeconds,
+    overTargetSeconds,
+    sessionCount: todaySessionCount,
+    progressPercent:
+      totalTargetSeconds > 0
+        ? getTimeProgressPercent(totalProgressSeconds, totalTargetSeconds)
+        : 0,
+  };
   const progress =
     totalTargetSeconds > 0
       ? getTimeProgressPercent(totalProgressSeconds, totalTargetSeconds)
@@ -505,6 +540,13 @@ function App() {
             <SubtaskWheel subtasks={activeTask.subtasks} />
           </section>
         )}
+        <StatsPanel
+          stats={stats}
+          taskStats={taskStats}
+          completedTasks={completedTasks}
+          visibleTaskCount={visibleTasks.length}
+          hiddenTaskCount={hiddenTasks.length}
+        />
       </main>
     </div>
   );

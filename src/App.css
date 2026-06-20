@@ -688,6 +688,130 @@ button {
   font-size: 28px;
 }
 
+/* STATS */
+
+.stats-section {
+  margin-top: 32px;
+  background: white;
+  border-radius: 28px;
+  padding: 28px;
+  box-shadow: 0 24px 70px rgba(27, 39, 94, 0.08);
+}
+
+.stats-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.stats-header span {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.stats-header h2 {
+  margin: 4px 0 0;
+  font-size: 28px;
+}
+
+.stats-header > strong {
+  color: #4338ca;
+  font-size: 34px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.stat-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.stat-box span {
+  display: block;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.stat-box strong {
+  color: #111827;
+  font-size: 24px;
+}
+
+.stats-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 18px 0;
+}
+
+.stats-meta span {
+  background: #eef2ff;
+  color: #4338ca;
+  border-radius: 999px;
+  padding: 7px 10px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.stats-task-list {
+  display: grid;
+  gap: 12px;
+}
+
+.stats-task-row {
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.stats-task-title {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-weight: 800;
+}
+
+.stats-task-title span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.stats-task-title strong {
+  color: #4338ca;
+}
+
+.stats-task-bar {
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 10px 0 8px;
+}
+
+.stats-task-bar div {
+  height: 100%;
+  background: linear-gradient(90deg, #2dd4bf, #635bff);
+  border-radius: inherit;
+}
+
+.stats-task-row small {
+  color: #64748b;
+  font-weight: 700;
+}
+
 /* RESPONSIVE */
 
 @media (max-width: 1100px) {
@@ -872,6 +996,41 @@ button {
     height: auto;
     aspect-ratio: 1;
     margin: 24px auto;
+  }
+
+  .stats-section {
+    margin-top: 16px;
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .stats-header h2 {
+    font-size: 22px;
+  }
+
+  .stats-header > strong {
+    font-size: 28px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .stat-box {
+    padding: 12px;
+  }
+
+  .stat-box strong {
+    font-size: 19px;
+  }
+
+  .stats-meta {
+    gap: 8px;
+  }
+
+  .stats-task-row {
+    padding: 12px;
   }
 
   .panel-actions {
