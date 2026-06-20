@@ -26,6 +26,17 @@ export const calculateElapsedSeconds = (startTime, now = new Date()) => {
   return calculateDuration(new Date(startTime), now);
 };
 
+export const getTargetSeconds = (task) => {
+  const targetMinutes = Number(task?.targetMinutes);
+  if (!Number.isFinite(targetMinutes) || targetMinutes <= 0) return 0;
+  return targetMinutes * 60;
+};
+
+export const getTimeProgressPercent = (spentSeconds, targetSeconds) => {
+  if (!targetSeconds || targetSeconds <= 0) return 0;
+  return Math.min(100, Math.round((spentSeconds / targetSeconds) * 100));
+};
+
 /**
  * Tworzy nową sesję
  * @param {Date} startTime - czas rozpoczęcia

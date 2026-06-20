@@ -10,6 +10,7 @@ function getTasksDefinitionSignature(tasks) {
       title: task.title,
       icon: task.icon,
       time: task.time,
+      targetMinutes: task.targetMinutes,
       description: task.description,
       done: task.done,
       subtasks: (task.subtasks || []).map((subtask) => ({

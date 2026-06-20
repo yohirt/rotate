@@ -11,10 +11,13 @@ import {
   clearRunningSession,
 } from "./utils/taskStorage";
 import {
+  calculateElapsedSeconds,
   createSession,
   endSession,
   addSessionToTask,
   getDailyDuration,
+  getTargetSeconds,
+  getTimeProgressPercent,
 } from "./utils/sessionTracker";
 import "./App.css";
 
@@ -76,6 +79,7 @@ function App() {
   const [sessionStartTime, setSessionStartTime] = useState(
     bootstrap.initialSessionStartTime
   );
+  const [currentTime, setCurrentTime] = useState(() => new Date());
 
   useEffect(() => {
     saveTasks(tasks);
@@ -89,6 +93,22 @@ function App() {
 
     clearRunningSession();
   }, [runningSession]);
+
+  useEffect(() => {
+    const updateCurrentTime = () => setCurrentTime(new Date());
+
+    const interval = setInterval(updateCurrentTime, 1000);
+    window.addEventListener("focus", updateCurrentTime);
+    window.addEventListener("pageshow", updateCurrentTime);
+    document.addEventListener("visibilitychange", updateCurrentTime);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("focus", updateCurrentTime);
+      window.removeEventListener("pageshow", updateCurrentTime);
+      document.removeEventListener("visibilitychange", updateCurrentTime);
+    };
+  }, []);
 
   const stopRunningSession = (endedAt) => {
     if (!runningSession) {
@@ -126,10 +146,47 @@ function App() {
 
   const activeTask = tasks[activeIndex] ?? null;
   const completedTasks = tasks.filter((task) => task.done).length;
-  const progress = tasks.length > 0 ? Math.round((completedTasks / tasks.length) * 100) : 0;
 
   // Łączny czas zapisanych sesji z całego dnia (wszystkie taski)
   const today = getLocalDateKey(new Date());
+  const runningSessionElapsed = runningSession
+    ? calculateElapsedSeconds(runningSession.startTime, currentTime)
+    : 0;
+
+  const getTaskSpentToday = (task) =>
+    getDailyDuration(task, today) +
+    (runningSession?.taskId === task.id ? runningSessionElapsed : 0);
+
+  const getTaskProgress = (task) => {
+    const targetSeconds = getTargetSeconds(task);
+    const spentSeconds = getTaskSpentToday(task);
+
+    return {
+      spentSeconds,
+      targetSeconds,
+      percent: getTimeProgressPercent(spentSeconds, targetSeconds),
+    };
+  };
+
+  const taskProgressById = Object.fromEntries(
+    tasks.map((task) => [task.id, getTaskProgress(task)])
+  );
+
+  const totalTargetSeconds = tasks.reduce(
+    (sum, task) => sum + getTargetSeconds(task),
+    0
+  );
+  const totalProgressSeconds = tasks.reduce((sum, task) => {
+    const taskProgress = taskProgressById[task.id];
+    return sum + Math.min(taskProgress.spentSeconds, taskProgress.targetSeconds);
+  }, 0);
+  const progress =
+    totalTargetSeconds > 0
+      ? getTimeProgressPercent(totalProgressSeconds, totalTargetSeconds)
+      : tasks.length > 0
+        ? Math.round((completedTasks / tasks.length) * 100)
+        : 0;
+
   const dailyTotalSaved = tasks.reduce(
     (sum, task) => sum + getDailyDuration(task, today),
     0
@@ -250,6 +307,7 @@ function App() {
               tasks={tasks}
               activeIndex={activeIndex}
               setActiveIndex={selectTask}
+              taskProgressById={taskProgressById}
             />
 
             <div className="progress-card">
@@ -276,8 +334,14 @@ function App() {
               showSubWheel={showSubWheel}
               setShowSubWheel={setShowSubWheel}
               sessionStartTime={sessionStartTime}
+              elapsedTime={
+                runningSession?.taskId === activeTask.id
+                  ? runningSessionElapsed
+                  : 0
+              }
               dailyTotalSaved={dailyTotalSaved}
               dailyTotalSavedForTask={dailyTotalSavedForTask}
+              taskProgress={taskProgressById[activeTask.id]}
             />
           ) : (
             <aside className="task-panel">

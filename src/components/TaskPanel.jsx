@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { calculateElapsedSeconds, formatDuration } from "../utils/sessionTracker";
+import { formatDuration } from "../utils/sessionTracker";
 
 function TaskPanel({
   task,
@@ -8,45 +7,35 @@ function TaskPanel({
   showSubWheel,
   setShowSubWheel,
   sessionStartTime,
+  elapsedTime = 0,
   dailyTotalSaved,
   dailyTotalSavedForTask,
+  taskProgress,
 }) {
-  const [elapsedTime, setElapsedTime] = useState(() =>
-    calculateElapsedSeconds(sessionStartTime)
-  );
   const completedSubtasks = task.subtasks.filter((subtask) => subtask.done).length;
-
-  useEffect(() => {
-    if (!sessionStartTime) {
-      return;
-    }
-
-    const updateElapsedTime = () => {
-      setElapsedTime(calculateElapsedSeconds(sessionStartTime));
-    };
-
-    const initialUpdate = setTimeout(updateElapsedTime, 0);
-    const interval = setInterval(updateElapsedTime, 1000);
-    window.addEventListener("focus", updateElapsedTime);
-    window.addEventListener("pageshow", updateElapsedTime);
-    document.addEventListener("visibilitychange", updateElapsedTime);
-
-    return () => {
-      clearTimeout(initialUpdate);
-      clearInterval(interval);
-      window.removeEventListener("focus", updateElapsedTime);
-      window.removeEventListener("pageshow", updateElapsedTime);
-      document.removeEventListener("visibilitychange", updateElapsedTime);
-    };
-  }, [sessionStartTime]);
-
   const elapsedTimeForDisplay = sessionStartTime ? elapsedTime : 0;
+  const targetSeconds = taskProgress?.targetSeconds ?? 0;
+  const spentSeconds = taskProgress?.spentSeconds ?? 0;
+  const progressPercent = taskProgress?.percent ?? 0;
 
   return (
     <aside className="task-panel">
       <div className="panel-icon">{task.icon}</div>
 
       <h2>{task.title}</h2>
+
+      <div className="task-goal">
+        <div>
+          <span>Cel czasowy</span>
+          <strong>
+            {formatDuration(spentSeconds)} / {formatDuration(targetSeconds)}
+          </strong>
+        </div>
+        <strong>{progressPercent}%</strong>
+      </div>
+      <div className="task-goal-bar">
+        <div style={{ width: `${progressPercent}%` }}></div>
+      </div>
 
       <div className="timer-display">
         <div className="timer-section">

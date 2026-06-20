@@ -1,4 +1,6 @@
-function TaskWheel({ tasks, activeIndex, setActiveIndex }) {
+import { formatDuration } from "../utils/sessionTracker";
+
+function TaskWheel({ tasks, activeIndex, setActiveIndex, taskProgressById = {} }) {
   if (tasks.length === 0) {
     return null;
   }
@@ -15,6 +17,11 @@ function TaskWheel({ tasks, activeIndex, setActiveIndex }) {
       >
         {tasks.map((task, index) => {
           const angle = index * angleStep;
+          const progress = taskProgressById[task.id] ?? {
+            percent: 0,
+            spentSeconds: 0,
+            targetSeconds: 0,
+          };
 
           return (
             <button
@@ -24,14 +31,21 @@ function TaskWheel({ tasks, activeIndex, setActiveIndex }) {
               } ${task.done ? "done" : ""}`}
               style={{
                 transform: `rotate(${angle}deg) translate(0, -155px) rotate(${-angle + activeIndex * angleStep}deg)`,
+                "--task-progress": `${progress.percent}%`,
               }}
               onClick={() => setActiveIndex(index)}
             >
+              <span className="wheel-item-fill" aria-hidden="true"></span>
               <span className="task-number">
                 {String(index + 1).padStart(2, "0")}
               </span>
+              <span className="task-percent">{progress.percent}%</span>
               <span className="task-icon">{task.icon}</span>
               <strong>{task.title}</strong>
+              <span className="task-time-progress">
+                {formatDuration(progress.spentSeconds)} /{" "}
+                {formatDuration(progress.targetSeconds)}
+              </span>
             </button>
           );
         })}
@@ -40,7 +54,7 @@ function TaskWheel({ tasks, activeIndex, setActiveIndex }) {
       <div className="wheel-center">
         <small>AKTUALNE ZADANIE</small>
         <h1>{tasks[activeIndex].title}</h1>
-        <p>{tasks[activeIndex].time}</p>
+        <p>{taskProgressById[tasks[activeIndex].id]?.percent ?? 0}% celu</p>
       </div>
     </div>
   );
