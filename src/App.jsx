@@ -415,17 +415,24 @@ function App() {
 
     const now = new Date();
     const nextTask = visibleTasks[nextIndex];
+    const reopenTaskIfDone = (taskId) => {
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task.id === taskId && task.done ? { ...task, done: false } : task
+        )
+      );
+    };
 
     if (nextIndex === activeIndex) {
       if (
         nextTask &&
-        !nextTask.done &&
         runningSession?.taskId !== nextTask.id
       ) {
         if (runningSession) {
           stopRunningSession(now);
         }
 
+        reopenTaskIfDone(nextTask.id);
         startRunningSessionForTask(nextTask.id, now);
       }
 
@@ -438,7 +445,8 @@ function App() {
 
     setActiveIndex(nextIndex);
 
-    if (nextTask && !nextTask.done) {
+    if (nextTask) {
+      reopenTaskIfDone(nextTask.id);
       startRunningSessionForTask(nextTask.id, now);
     }
   };
