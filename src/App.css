@@ -215,7 +215,7 @@ button {
   right: 0;
   bottom: 0;
   height: var(--task-progress, 0%);
-  background: linear-gradient(180deg, rgba(45, 212, 191, 0.2), rgba(99, 91, 255, 0.28));
+  background: linear-gradient(180deg, rgba(45, 212, 191, 0.14), rgba(99, 91, 255, 0.2));
   transition: height 0.5s ease;
   z-index: 0;
 }
@@ -259,7 +259,9 @@ button {
 }
 
 .wheel-item strong {
+  color: #111827;
   font-size: 13px;
+  font-weight: 850;
   text-align: center;
   line-height: 1.25;
 }
@@ -863,21 +865,33 @@ button {
   }
 
   .task-wheel {
-    --wheel-radius: 112px;
+    --wheel-radius: 116px;
     width: min(100%, 340px);
     height: auto;
     aspect-ratio: 1;
   }
 
   .wheel-item {
-    width: 92px;
-    min-height: 76px;
-    margin-left: -46px;
-    margin-top: -38px;
+    width: 108px;
+    min-height: 88px;
+    margin-left: -54px;
+    margin-top: -44px;
     transform-origin: center;
-    padding: 13px 7px 7px;
-    border-radius: 16px;
-    gap: 2px;
+    padding: 16px 9px 9px;
+    border-radius: 18px;
+    gap: 3px;
+    background: rgba(255, 255, 255, 0.94);
+    border-color: rgba(148, 163, 184, 0.48);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+  }
+
+  .wheel-item.active {
+    background: linear-gradient(135deg, #ffffff, #eef2ff);
+    box-shadow: 0 16px 36px rgba(67, 56, 202, 0.24);
+  }
+
+  .wheel-item-fill {
+    background: linear-gradient(180deg, rgba(45, 212, 191, 0.1), rgba(99, 91, 255, 0.16));
   }
 
   .task-number {
@@ -887,19 +901,32 @@ button {
   }
 
   .wheel-item strong {
-    font-size: 9px;
-    line-height: 1.15;
-    max-width: 78px;
+    color: #0f172a;
+    font-size: 11px;
+    line-height: 1.18;
+    max-width: 92px;
+    font-weight: 900;
     overflow-wrap: anywhere;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.85);
   }
 
-  .task-percent,
+  .task-percent {
+    top: 7px;
+    right: 8px;
+    background: rgba(238, 242, 255, 0.92);
+    border: 1px solid rgba(99, 91, 255, 0.16);
+    border-radius: 999px;
+    color: #3730a3;
+    font-size: 9px;
+    padding: 2px 5px;
+  }
+
   .task-time-progress {
-    font-size: 8px;
+    display: none;
   }
 
   .task-icon {
-    font-size: 16px;
+    font-size: 19px;
   }
 
   .wheel-center {
@@ -1047,15 +1074,20 @@ button {
 
 @media (max-width: 390px) {
   .task-wheel {
-    --wheel-radius: 98px;
-    width: min(100%, 310px);
+    --wheel-radius: 104px;
+    width: min(100%, 318px);
   }
 
   .wheel-item {
-    width: 82px;
-    min-height: 70px;
-    margin-left: -41px;
-    margin-top: -35px;
+    width: 98px;
+    min-height: 82px;
+    margin-left: -49px;
+    margin-top: -41px;
+  }
+
+  .wheel-item strong {
+    font-size: 10px;
+    max-width: 84px;
   }
 
   .wheel-center {
