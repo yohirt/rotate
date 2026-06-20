@@ -1,16 +1,15 @@
 export const initialTasks = [
   {
     id: 1,
-    title: "Przygotuj śniadanie",
-    icon: "🥣",
-    time: "07:30 - 08:00",
-    description: "Przygotuj zdrowe i pożywne śniadanie na dobry początek dnia.",
+    title: "Nauka do mianowania",
+    icon: "📚",
+    time: "",
+    description: "Mianowanie na wyższy stopień w pracy.",
     done: false,
     subtasks: [
-      { id: 1, title: "Wyjmij składniki", done: true },
-      { id: 2, title: "Przygotuj produkty", done: true },
-      { id: 3, title: "Zrób kanapki / posiłek", done: false },
-      { id: 4, title: "Sprzątnij kuchnię", done: false },
+      { id: 1, title: "Wydrukuj materiałów", done: false },
+      { id: 2, title: "Przygotowanie AI", done: false },
+      { id: 3, title: "Czytanie", done: false },
     ],
     sessions: [],
   },
@@ -23,7 +22,7 @@ export const initialTasks = [
     done: false,
     subtasks: [
       { id: 1, title: "Jazz", done: true },
-      { id: 2, title: "Nuty", done: true },
+      { id: 2, title: "Nuty, lub technika", done: true },
       { id: 3, title: "BrukBand", done: false },
       { id: 4, title: "Werbel", done: false },
     ],

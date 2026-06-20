@@ -1,9 +1,42 @@
 export const TASKS_STORAGE_KEY = "rotate.tasks.v1";
 export const RUNNING_SESSION_STORAGE_KEY = "rotate.running-session.v1";
+export const TASKS_DEFINITION_SIGNATURE_STORAGE_KEY =
+  "rotate.tasks-definition-signature.v1";
+
+function getTasksDefinitionSignature(tasks) {
+  return JSON.stringify(
+    tasks.map((task) => ({
+      id: task.id,
+      title: task.title,
+      icon: task.icon,
+      time: task.time,
+      description: task.description,
+      done: task.done,
+      subtasks: (task.subtasks || []).map((subtask) => ({
+        id: subtask.id,
+        title: subtask.title,
+        done: subtask.done,
+      })),
+    }))
+  );
+}
 
 export function loadTasks(fallbackTasks) {
   try {
+    const fallbackSignature = getTasksDefinitionSignature(fallbackTasks);
+    const storedSignature = localStorage.getItem(
+      TASKS_DEFINITION_SIGNATURE_STORAGE_KEY
+    );
     const storedTasks = localStorage.getItem(TASKS_STORAGE_KEY);
+
+    if (storedSignature !== fallbackSignature) {
+      localStorage.setItem(
+        TASKS_DEFINITION_SIGNATURE_STORAGE_KEY,
+        fallbackSignature
+      );
+      return fallbackTasks;
+    }
+
     if (!storedTasks) {
       return fallbackTasks;
     }
