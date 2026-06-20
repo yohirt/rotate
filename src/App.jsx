@@ -732,7 +732,7 @@ function App() {
 
             <div className="cycle-title">
               <span>Mój cykl:</span>
-              <strong> Codzienna rutyna</strong>
+              <strong> Codzienna sukcesywność</strong>
             </div>
           </div>
 
