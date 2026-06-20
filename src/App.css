@@ -1950,8 +1950,7 @@ button {
   .panel-topline,
   .meta,
   .description,
-  .task-panel hr,
-  .panel-actions {
+  .task-panel hr {
     display: none;
   }
 
@@ -2006,6 +2005,20 @@ button {
   .add-subtask-button {
     display: block;
     margin-bottom: 10px;
+  }
+
+  .panel-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+    margin-top: 16px;
+  }
+
+  .panel-actions button {
+    min-height: 42px;
+    border-radius: 14px;
+    padding: 10px 8px;
+    font-size: 12px;
   }
 
   .subtask-list {

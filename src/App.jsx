@@ -407,7 +407,6 @@ function App() {
 
   const selectTask = (nextIndex) => {
     if (
-      nextIndex === activeIndex ||
       nextIndex < 0 ||
       nextIndex >= visibleTasks.length
     ) {
@@ -415,13 +414,30 @@ function App() {
     }
 
     const now = new Date();
+    const nextTask = visibleTasks[nextIndex];
+
+    if (nextIndex === activeIndex) {
+      if (
+        nextTask &&
+        !nextTask.done &&
+        runningSession?.taskId !== nextTask.id
+      ) {
+        if (runningSession) {
+          stopRunningSession(now);
+        }
+
+        startRunningSessionForTask(nextTask.id, now);
+      }
+
+      return;
+    }
+
     if (runningSession) {
       stopRunningSession(now);
     }
 
     setActiveIndex(nextIndex);
 
-    const nextTask = visibleTasks[nextIndex];
     if (nextTask && !nextTask.done) {
       startRunningSessionForTask(nextTask.id, now);
     }
