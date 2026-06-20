@@ -722,35 +722,18 @@ function App() {
 
   return (
     <div className="app">
-      <aside className="sidebar">
-        <div className="logo">
-          <span className="logo-mark"></span>
-          <strong>rotate.ma</strong>
-        </div>
-
-        <nav className="menu">
-          <button className="active">🏠 Dzisiaj</button>
-          <button>🔁 Moje cykle</button>
-          <button>📅 Kalendarz</button>
-          <button>📊 Statystyki</button>
-          <button>🕘 Historia</button>
-          <button>⚙️ Ustawienia</button>
-        </nav>
-
-        <div className="user-box">
-          <div className="avatar">R</div>
-          <div>
-            <strong>Rafał</strong>
-            <small>aktywny cykl</small>
-          </div>
-        </div>
-      </aside>
-
       <main className="main">
         <header className="topbar">
-          <div>
-            <span>Mój cykl:</span>
-            <strong> Codzienna rutyna</strong>
+          <div className="topbar-primary">
+            <div className="logo">
+              <span className="logo-mark"></span>
+              <strong>rotate.ma</strong>
+            </div>
+
+            <div className="cycle-title">
+              <span>Mój cykl:</span>
+              <strong> Codzienna rutyna</strong>
+            </div>
           </div>
 
           <div className="topbar-actions">
@@ -776,6 +759,16 @@ function App() {
             <button>⋮</button>
           </div>
         </header>
+
+        <nav className="top-menu" aria-label="Główne">
+          <button className="active">🏠 Dzisiaj</button>
+          <button>🔁 Moje cykle</button>
+          <button>📅 Kalendarz</button>
+          <button>📊 Statystyki</button>
+          <button>🕘 Historia</button>
+          <button>⚙️ Ustawienia</button>
+        </nav>
+
         {installNotice && (
           <div className="install-notice" role="status">
             {installNotice}
