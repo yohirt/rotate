@@ -1939,34 +1939,83 @@ button {
 
   .main {
     width: min(100%, 430px);
-    padding: 0 0 94px;
+    padding: 10px 10px 94px;
   }
 
   .topbar {
-    min-height: 44px;
-    margin: 0 0 8px;
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    box-shadow: none;
-    padding: 0;
+    display: flex;
+    min-height: auto;
+    margin: 0 0 12px;
+    border: 1px solid rgba(220, 231, 243, 0.88);
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.82);
+    box-shadow: 0 16px 38px rgba(31, 73, 125, 0.09);
+    padding: 12px;
   }
 
   .topbar::before {
-    position: fixed;
-    z-index: 90;
-    top: 0;
-    left: 50%;
-    width: 118px;
-    height: 18px;
-    border-radius: 0 0 15px 15px;
-    background: #090d17;
-    content: "";
-    transform: translateX(-50%);
+    display: none;
   }
 
   .topbar-primary,
   .topbar-actions {
+    display: flex;
+    width: 100%;
+  }
+
+  .topbar-primary {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .topbar .logo {
+    font-size: 20px;
+  }
+
+  .topbar .logo-mark {
+    width: 34px;
+    height: 34px;
+    border-width: 8px;
+  }
+
+  .topbar .logo-mark::after {
+    inset: 6px;
+  }
+
+  .cycle-title {
+    font-size: 12px;
+    text-align: right;
+  }
+
+  .cycle-title strong {
+    font-size: 15px;
+  }
+
+  .topbar-actions {
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  .topbar-actions span {
+    flex: 1 1 100%;
+    justify-content: center;
+    min-height: 34px;
+    font-size: 12px;
+    padding: 7px 10px;
+  }
+
+  .topbar-actions .install-button,
+  .topbar-actions .pwa-refresh-button {
+    flex: 1 1 calc(50% - 4px);
+    width: auto;
+    min-height: 36px;
+    font-size: 12px;
+    padding: 7px 10px;
+  }
+
+  .topbar-actions button:not(.install-button):not(.pwa-refresh-button) {
     display: none;
   }
 
