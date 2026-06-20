@@ -233,6 +233,36 @@ function App() {
     );
   };
 
+  const refreshPwaCache = async () => {
+    try {
+      if ("serviceWorker" in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(
+          registrations.map((registration) => registration.unregister())
+        );
+      }
+
+      if ("caches" in window) {
+        const cacheNames = await caches.keys();
+        await Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName)));
+      }
+
+      pendingInstallPrompt = null;
+      setInstallPrompt(null);
+      setInstallNotice("Cache PWA odświeżony. Strona za chwilę się przeładuje.");
+
+      window.setTimeout(() => {
+        window.location.replace(
+          `${window.location.pathname}?pwa-refresh=${Date.now()}`
+        );
+      }, 700);
+    } catch {
+      setInstallNotice(
+        "Nie udało się odświeżyć PWA automatycznie. Spróbuj wyczyścić dane strony w przeglądarce."
+      );
+    }
+  };
+
   const stopRunningSession = (endedAt) => {
     if (!runningSession) {
       return;
@@ -735,6 +765,13 @@ function App() {
                 Instaluj
               </button>
             )}
+            <button
+              className="pwa-refresh-button"
+              type="button"
+              onClick={refreshPwaCache}
+            >
+              Odśwież PWA
+            </button>
             <button>🔔</button>
             <button>⋮</button>
           </div>

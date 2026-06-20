@@ -146,6 +146,18 @@ button {
   white-space: nowrap;
 }
 
+.topbar-actions .pwa-refresh-button {
+  min-height: 38px;
+  border: 1px solid #c7d2fe;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #3730a3;
+  font-size: 14px;
+  font-weight: 850;
+  padding: 8px 14px;
+  white-space: nowrap;
+}
+
 .install-notice {
   margin: -12px 0 18px;
   border: 1px solid #c7d2fe;
@@ -1093,9 +1105,14 @@ button {
     font-size: 14px;
   }
 
-  .topbar-actions .install-button {
+  .topbar-actions .install-button,
+  .topbar-actions .pwa-refresh-button {
     order: 3;
     width: 100%;
+  }
+
+  .topbar-actions .pwa-refresh-button {
+    order: 4;
   }
 
   .install-notice {
