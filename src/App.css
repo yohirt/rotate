@@ -113,6 +113,10 @@ button {
   gap: 18px;
 }
 
+.topbar-actions span + span {
+  display: none;
+}
+
 .topbar-actions button {
   border: 0;
   background: transparent;
@@ -283,7 +287,7 @@ button {
 
 .wheel-center p {
   margin: 0;
-  color: #4b5563;
+  color: #202833;
 }
 
 /* PROGRESS */

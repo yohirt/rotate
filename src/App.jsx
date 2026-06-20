@@ -29,6 +29,13 @@ const getLocalDateKey = (date) => {
   return `${year}-${month}-${day}`;
 };
 
+const formatHeaderDate = (date) =>
+  date.toLocaleDateString("pl-PL", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
+
 function App() {
   const [bootstrap] = useState(() => {
     const initialTasksState = loadTasks(initialTasks);
@@ -170,6 +177,7 @@ function App() {
 
   // Łączny czas zapisanych sesji z całego dnia (wszystkie taski)
   const today = getLocalDateKey(new Date());
+  const headerDate = formatHeaderDate(currentTime);
   const runningSessionElapsed = runningSession
     ? calculateElapsedSeconds(runningSession.startTime, currentTime)
     : 0;
@@ -411,6 +419,7 @@ function App() {
           </div>
 
           <div className="topbar-actions">
+            <span>📅 {headerDate}</span>
             <span>📅 Środa, 22 maja</span>
             <button>🔔</button>
             <button>⋮</button>
