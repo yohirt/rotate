@@ -1947,11 +1947,27 @@ button {
     box-shadow: 0 18px 38px rgba(41, 67, 98, 0.14);
   }
 
-  .panel-topline,
   .meta,
   .description,
   .task-panel hr {
     display: none;
+  }
+
+  .panel-topline {
+    display: flex;
+    margin-bottom: 10px;
+  }
+
+  .panel-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 16px;
+    font-size: 24px;
+  }
+
+  .panel-topline .icon-button {
+    width: 40px;
+    height: 40px;
   }
 
   .task-panel h2 {
