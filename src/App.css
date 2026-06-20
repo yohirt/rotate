@@ -342,6 +342,41 @@ button {
   box-shadow: 0 16px 45px rgba(31, 41, 55, 0.1);
 }
 
+.add-task-form {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.compact-form-row {
+  display: grid;
+  grid-template-columns: 86px minmax(0, 1fr);
+  gap: 10px;
+  align-items: end;
+}
+
+.add-task-button,
+.add-subtask-button {
+  width: 100%;
+  min-height: 42px;
+  border: 1px dashed #a5b4fc;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: #4338ca;
+  cursor: pointer;
+  font-weight: 850;
+}
+
+.add-task-button {
+  margin-top: 14px;
+}
+
+.add-task-button:hover,
+.add-subtask-button:hover {
+  border-color: #635bff;
+  background: #eef2ff;
+}
+
 .progress-title {
   display: flex;
   justify-content: space-between;
@@ -655,9 +690,23 @@ button {
   display: flex;
   justify-content: space-between;
   font-size: 14px;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
   text-transform: uppercase;
   color: #64748b;
+}
+
+.add-subtask-form {
+  grid-template-columns: minmax(0, 1fr) 110px;
+  align-items: end;
+  margin-bottom: 16px;
+}
+
+.add-subtask-form .edit-actions {
+  grid-column: 1 / -1;
+}
+
+.add-subtask-button {
+  margin-bottom: 16px;
 }
 
 .subtask-list {
@@ -720,11 +769,21 @@ button {
   text-align: left;
 }
 
-.subtask-edit-button {
+.subtask-edit-button,
+.subtask-delete-button {
   flex: 0 0 32px;
   width: 32px;
   height: 32px;
   font-size: 14px;
+}
+
+.subtask-delete-button {
+  color: #b91c1c;
+}
+
+.subtask-delete-button:hover {
+  border-color: #fecaca;
+  background: #fef2f2;
 }
 
 .subtask-title-row {
@@ -776,7 +835,7 @@ button {
 
 .panel-actions {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 14px;
   margin-top: 34px;
 }
@@ -802,6 +861,11 @@ button {
 .primary {
   background: linear-gradient(135deg, #635bff, #4338ca);
   color: white;
+}
+
+.danger {
+  background: #fef2f2;
+  color: #b91c1c;
 }
 
 /* SUBTASK WHEEL */
@@ -1160,6 +1224,11 @@ button {
     width: 100%;
     padding: 14px;
     border-radius: 14px;
+  }
+
+  .compact-form-row,
+  .add-subtask-form {
+    grid-template-columns: 1fr;
   }
 
   .task-panel {

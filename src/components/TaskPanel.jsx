@@ -30,10 +30,18 @@ const getSubtaskFormState = (subtask) => ({
   targetMinutes: String(subtask.targetMinutes ?? 0),
 });
 
+const emptySubtaskForm = {
+  title: "",
+  targetMinutes: "15",
+};
+
 function TaskPanel({
   task,
   finishTask,
   hideTask,
+  deleteTask,
+  addSubtask,
+  deleteSubtask,
   updateTask,
   updateSubtask,
   toggleSubtask,
@@ -50,8 +58,10 @@ function TaskPanel({
 }) {
   const [isEditingTask, setIsEditingTask] = useState(false);
   const [editingSubtaskId, setEditingSubtaskId] = useState(null);
+  const [isAddingSubtask, setIsAddingSubtask] = useState(false);
   const [taskForm, setTaskForm] = useState(() => getTaskFormState(task));
   const [subtaskForm, setSubtaskForm] = useState(null);
+  const [newSubtaskForm, setNewSubtaskForm] = useState(emptySubtaskForm);
   const completedSubtasks = task.subtasks.filter((subtask) => subtask.done).length;
   const elapsedTimeForDisplay = sessionStartTime ? elapsedTime : 0;
   const targetSeconds = taskProgress?.targetSeconds ?? 0;
@@ -98,6 +108,14 @@ function TaskPanel({
     });
     setEditingSubtaskId(null);
     setSubtaskForm(null);
+  };
+
+  const submitNewSubtask = (event) => {
+    event.preventDefault();
+
+    addSubtask(task.id, newSubtaskForm);
+    setNewSubtaskForm(emptySubtaskForm);
+    setIsAddingSubtask(false);
   };
 
   return (
@@ -231,6 +249,58 @@ function TaskPanel({
         </span>
       </div>
 
+      {isAddingSubtask ? (
+        <form className="edit-form add-subtask-form" onSubmit={submitNewSubtask}>
+          <label>
+            <span>Nazwa podzadania</span>
+            <input
+              value={newSubtaskForm.title}
+              onChange={(event) =>
+                setNewSubtaskForm((currentForm) => ({
+                  ...currentForm,
+                  title: event.target.value,
+                }))
+              }
+            />
+          </label>
+          <label>
+            <span>Cel w minutach</span>
+            <input
+              type="number"
+              min="0"
+              step="5"
+              value={newSubtaskForm.targetMinutes}
+              onChange={(event) =>
+                setNewSubtaskForm((currentForm) => ({
+                  ...currentForm,
+                  targetMinutes: event.target.value,
+                }))
+              }
+            />
+          </label>
+          <div className="edit-actions">
+            <button
+              type="button"
+              onClick={() => {
+                setIsAddingSubtask(false);
+                setNewSubtaskForm(emptySubtaskForm);
+              }}
+            >
+              Anuluj
+            </button>
+            <button type="submit">Dodaj</button>
+          </div>
+        </form>
+      ) : (
+        <button
+          type="button"
+          className="add-subtask-button"
+          onClick={() => setIsAddingSubtask(true)}
+        >
+          + Dodaj podzadanie
+        </button>
+      )}
+
       {task.subtasks.length > 0 ? (
         <ul className="subtask-list">
           {task.subtasks.map((subtask) => {
@@ -334,6 +404,16 @@ function TaskPanel({
                     >
                       {"\u270E"}
                     </button>
+
+                    <button
+                      type="button"
+                      className="icon-button subtask-delete-button"
+                      onClick={() => deleteSubtask(task.id, subtask.id)}
+                      aria-label={`Usun podzadanie ${subtask.title}`}
+                      title="Usun podzadanie"
+                    >
+                      {"\u00D7"}
+                    </button>
                   </>
                 )}
               </li>
@@ -359,6 +439,10 @@ function TaskPanel({
 
         <button className="primary" onClick={finishTask}>
           {"\u2713"} Zatrzymaj zadanie
+        </button>
+
+        <button className="danger" onClick={() => deleteTask(task.id)}>
+          Usuń task
         </button>
       </div>
     </aside>

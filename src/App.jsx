@@ -38,6 +38,26 @@ const formatHeaderDate = (date) =>
     month: "long",
   });
 
+const emptyTaskForm = {
+  title: "",
+  icon: "\u{1F3AF}",
+  targetMinutes: "30",
+  description: "",
+};
+
+const createTaskFromForm = (form, nextId) => ({
+  id: nextId,
+  title: form.title.trim() || "Nowy task",
+  icon: form.icon.trim() || "\u{1F3AF}",
+  time: "",
+  targetMinutes: Math.max(0, Number(form.targetMinutes) || 0),
+  description: form.description.trim(),
+  done: false,
+  hidden: false,
+  subtasks: [],
+  sessions: [],
+});
+
 function App() {
   const [installPrompt, setInstallPrompt] = useState(null);
   const [installNotice, setInstallNotice] = useState("");
@@ -109,6 +129,8 @@ function App() {
   const [tasks, setTasks] = useState(bootstrap.initialTasksState);
   const [activeIndex, setActiveIndex] = useState(bootstrap.initialActiveIndex);
   const [showSubWheel, setShowSubWheel] = useState(false);
+  const [isAddingTask, setIsAddingTask] = useState(false);
+  const [newTaskForm, setNewTaskForm] = useState(emptyTaskForm);
   const [runningSession, setRunningSession] = useState(
     bootstrap.initialRunningSession
   );
@@ -517,6 +539,139 @@ function App() {
     );
   }
 
+  function updateNewTaskFormField(field, value) {
+    setNewTaskForm((currentForm) => ({ ...currentForm, [field]: value }));
+  }
+
+  function addTask(event) {
+    event.preventDefault();
+
+    const nextId =
+      tasks.reduce((maxId, task) => Math.max(maxId, Number(task.id) || 0), 0) + 1;
+    const nextTask = createTaskFromForm(newTaskForm, nextId);
+    const hadVisibleTasks = visibleTasks.length > 0;
+
+    setTasks((prevTasks) => [...prevTasks, nextTask]);
+    setNewTaskForm(emptyTaskForm);
+    setIsAddingTask(false);
+
+    if (!hadVisibleTasks) {
+      setActiveIndex(0);
+      startRunningSessionForTask(nextTask.id, new Date());
+    }
+  }
+
+  function deleteTask(taskId) {
+    const taskToDelete = tasks.find((task) => task.id === taskId);
+    if (!taskToDelete) {
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Usunac task "${taskToDelete.title}" razem z jego historia?`
+    );
+    if (!confirmed) {
+      return;
+    }
+
+    const now = new Date();
+    const wasRunning = runningSession?.taskId === taskId;
+    const wasActive = activeTask?.id === taskId;
+    const visibleAfterDelete = visibleTasks.filter((task) => task.id !== taskId);
+
+    if (wasRunning) {
+      stopRunningSession(now);
+      setSessionStartTime(null);
+    }
+
+    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
+    setShowSubWheel(false);
+
+    if (!wasActive) {
+      return;
+    }
+
+    const nextActiveIndex =
+      visibleAfterDelete.length > 0
+        ? Math.min(activeIndex, visibleAfterDelete.length - 1)
+        : 0;
+    setActiveIndex(nextActiveIndex);
+
+    const nextTask = visibleAfterDelete[nextActiveIndex];
+    if (wasRunning && nextTask && !nextTask.done) {
+      startRunningSessionForTask(nextTask.id, now);
+    }
+  }
+
+  function addSubtask(taskId, subtaskInput) {
+    setTasks((prevTasks) =>
+      prevTasks.map((task) => {
+        if (task.id !== taskId) return task;
+
+        const nextSubtaskId =
+          task.subtasks.reduce(
+            (maxId, subtask) => Math.max(maxId, Number(subtask.id) || 0),
+            0
+          ) + 1;
+
+        return {
+          ...task,
+          subtasks: [
+            ...task.subtasks,
+            {
+              id: nextSubtaskId,
+              title: subtaskInput.title.trim() || "Nowe podzadanie",
+              targetMinutes: Math.max(
+                0,
+                Number(subtaskInput.targetMinutes) || 0
+              ),
+              done: false,
+            },
+          ],
+        };
+      })
+    );
+  }
+
+  function deleteSubtask(taskId, subtaskId) {
+    const task = tasks.find((currentTask) => currentTask.id === taskId);
+    const subtask = task?.subtasks.find(
+      (currentSubtask) => currentSubtask.id === subtaskId
+    );
+    if (!task || !subtask) {
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Usunac podzadanie "${subtask.title}" razem z jego historia?`
+    );
+    if (!confirmed) {
+      return;
+    }
+
+    const now = new Date();
+    if (runningSession?.taskId === taskId && runningSession?.subtaskId === subtaskId) {
+      stopRunningSession(now);
+      startRunningSessionForTask(taskId, now);
+    }
+
+    setTasks((prevTasks) =>
+      prevTasks.map((currentTask) =>
+        currentTask.id === taskId
+          ? {
+              ...currentTask,
+              subtasks: currentTask.subtasks.filter(
+                (currentSubtask) => currentSubtask.id !== subtaskId
+              ),
+              sessions: (currentTask.sessions || []).filter(
+                (session) => session.subtaskId !== subtaskId
+              ),
+            }
+          : currentTask
+      )
+    );
+  }
+
   return (
     <div className="app">
       <aside className="sidebar">
@@ -595,6 +750,80 @@ function App() {
                 {completedTasks} z {tasks.length} zadań wykonane
               </small>
 
+              {isAddingTask ? (
+                <form className="edit-form add-task-form" onSubmit={addTask}>
+                  <label>
+                    <span>Nazwa taska</span>
+                    <input
+                      value={newTaskForm.title}
+                      onChange={(event) =>
+                        updateNewTaskFormField("title", event.target.value)
+                      }
+                    />
+                  </label>
+
+                  <div className="compact-form-row">
+                    <label>
+                      <span>Ikona</span>
+                      <input
+                        className="icon-input"
+                        value={newTaskForm.icon}
+                        onChange={(event) =>
+                          updateNewTaskFormField("icon", event.target.value)
+                        }
+                      />
+                    </label>
+                    <label>
+                      <span>Minuty</span>
+                      <input
+                        type="number"
+                        min="0"
+                        step="5"
+                        value={newTaskForm.targetMinutes}
+                        onChange={(event) =>
+                          updateNewTaskFormField(
+                            "targetMinutes",
+                            event.target.value
+                          )
+                        }
+                      />
+                    </label>
+                  </div>
+
+                  <label>
+                    <span>Opis</span>
+                    <textarea
+                      rows="2"
+                      value={newTaskForm.description}
+                      onChange={(event) =>
+                        updateNewTaskFormField("description", event.target.value)
+                      }
+                    />
+                  </label>
+
+                  <div className="edit-actions">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsAddingTask(false);
+                        setNewTaskForm(emptyTaskForm);
+                      }}
+                    >
+                      Anuluj
+                    </button>
+                    <button type="submit">Dodaj</button>
+                  </div>
+                </form>
+              ) : (
+                <button
+                  type="button"
+                  className="add-task-button"
+                  onClick={() => setIsAddingTask(true)}
+                >
+                  + Dodaj task
+                </button>
+              )}
+
               {hiddenTasks.length > 0 && (
                 <div className="hidden-task-list">
                   <span>Ukryte</span>
@@ -618,6 +847,9 @@ function App() {
               task={activeTask}
               finishTask={finishTask}
               hideTask={hideTask}
+              deleteTask={deleteTask}
+              addSubtask={addSubtask}
+              deleteSubtask={deleteSubtask}
               updateTask={updateTask}
               updateSubtask={updateSubtask}
               toggleSubtask={toggleSubtask}
@@ -644,6 +876,53 @@ function App() {
             <aside className="task-panel">
               <h2>Brak zadań</h2>
               <p className="empty">Dodaj zadania, aby rozpocząć cykl.</p>
+              <form className="edit-form task-edit-form" onSubmit={addTask}>
+                <label>
+                  <span>Nazwa taska</span>
+                  <input
+                    value={newTaskForm.title}
+                    onChange={(event) =>
+                      updateNewTaskFormField("title", event.target.value)
+                    }
+                  />
+                </label>
+                <div className="compact-form-row">
+                  <label>
+                    <span>Ikona</span>
+                    <input
+                      className="icon-input"
+                      value={newTaskForm.icon}
+                      onChange={(event) =>
+                        updateNewTaskFormField("icon", event.target.value)
+                      }
+                    />
+                  </label>
+                  <label>
+                    <span>Minuty</span>
+                    <input
+                      type="number"
+                      min="0"
+                      step="5"
+                      value={newTaskForm.targetMinutes}
+                      onChange={(event) =>
+                        updateNewTaskFormField(
+                          "targetMinutes",
+                          event.target.value
+                        )
+                      }
+                    />
+                  </label>
+                </div>
+                <div className="edit-actions">
+                  <button
+                    type="button"
+                    onClick={() => setNewTaskForm(emptyTaskForm)}
+                  >
+                    Wyczyść
+                  </button>
+                  <button type="submit">Dodaj task</button>
+                </div>
+              </form>
             </aside>
           )}
         </section>
