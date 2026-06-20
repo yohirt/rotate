@@ -4,6 +4,7 @@
 
 html {
   overflow-x: hidden;
+  color-scheme: light;
 }
 
 body {
@@ -13,6 +14,8 @@ body {
   background: #f4f7fb;
   color: #111827;
   overflow-x: hidden;
+  color-scheme: light;
+  -webkit-text-size-adjust: 100%;
 }
 
 button {
@@ -206,7 +209,7 @@ button {
 
 .wheel-item > :not(.wheel-item-fill) {
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 .wheel-item-fill {
@@ -260,6 +263,7 @@ button {
 
 .wheel-item strong {
   color: #111827;
+  -webkit-text-fill-color: #111827;
   font-size: 13px;
   font-weight: 850;
   text-align: center;
@@ -274,6 +278,7 @@ button {
 
 .wheel-center {
   position: absolute;
+  z-index: 25;
   width: 210px;
   height: 210px;
   border-radius: 50%;
@@ -384,6 +389,8 @@ button {
 }
 
 .task-panel h2 {
+  color: #111827;
+  -webkit-text-fill-color: #111827;
   font-size: 28px;
   margin: 0 0 16px;
 }
@@ -399,6 +406,7 @@ button {
 .task-goal span {
   display: block;
   color: #64748b;
+  -webkit-text-fill-color: #64748b;
   font-size: 12px;
   font-weight: 800;
   text-transform: uppercase;
@@ -406,10 +414,12 @@ button {
 
 .task-goal strong {
   color: #111827;
+  -webkit-text-fill-color: #111827;
 }
 
 .task-goal > strong {
   color: #4338ca;
+  -webkit-text-fill-color: #4338ca;
   font-size: 28px;
 }
 
@@ -873,11 +883,14 @@ button {
 
   .wheel-item {
     width: 108px;
-    min-height: 88px;
+    min-height: 96px;
     margin-left: -54px;
-    margin-top: -44px;
+    margin-top: -48px;
     transform-origin: center;
-    padding: 16px 9px 9px;
+    grid-template-rows: minmax(30px, auto) 18px 1fr;
+    align-content: start;
+    justify-items: center;
+    padding: 10px 9px 8px;
     border-radius: 18px;
     gap: 3px;
     background: rgba(255, 255, 255, 0.94);
@@ -895,30 +908,42 @@ button {
   }
 
   .task-number {
-    top: -12px;
-    padding: 4px 7px;
-    font-size: 10px;
+    display: none;
   }
 
   .wheel-item strong {
     color: #0f172a;
-    font-size: 11px;
-    line-height: 1.18;
-    max-width: 92px;
+    -webkit-text-fill-color: #0f172a;
+    grid-row: 1;
+    align-self: start;
+    order: -1;
+    font-size: 13px;
+    line-height: 1.12;
+    max-width: 96px;
     font-weight: 900;
     overflow-wrap: anywhere;
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.82);
+    border-radius: 8px;
+    padding: 3px 5px;
   }
 
-  .task-percent {
-    top: 7px;
-    right: 8px;
+  .wheel-item > .task-percent {
+    position: static;
+    inset: auto;
+    transform: none;
+    grid-row: 2;
+    align-self: center;
+    justify-self: center;
     background: rgba(238, 242, 255, 0.92);
     border: 1px solid rgba(99, 91, 255, 0.16);
     border-radius: 999px;
     color: #3730a3;
     font-size: 9px;
+    line-height: 1;
     padding: 2px 5px;
+    min-width: 28px;
+    text-align: center;
   }
 
   .task-time-progress {
@@ -926,7 +951,11 @@ button {
   }
 
   .task-icon {
-    font-size: 19px;
+    grid-row: 3;
+    align-self: center;
+    font-size: 26px;
+    line-height: 1;
+    margin-top: 3px;
   }
 
   .wheel-center {
@@ -960,6 +989,8 @@ button {
   }
 
   .task-panel h2 {
+    color: #0f172a;
+    -webkit-text-fill-color: #0f172a;
     font-size: 22px;
     margin-bottom: 12px;
     overflow-wrap: anywhere;
@@ -1080,14 +1111,19 @@ button {
 
   .wheel-item {
     width: 98px;
-    min-height: 82px;
+    min-height: 90px;
     margin-left: -49px;
-    margin-top: -41px;
+    margin-top: -45px;
+    grid-template-rows: minmax(28px, auto) 17px 1fr;
   }
 
   .wheel-item strong {
-    font-size: 10px;
-    max-width: 84px;
+    font-size: 12px;
+    max-width: 86px;
+  }
+
+  .task-icon {
+    font-size: 23px;
   }
 
   .wheel-center {

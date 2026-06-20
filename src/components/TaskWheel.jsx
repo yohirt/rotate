@@ -6,6 +6,19 @@ function TaskWheel({ tasks, activeIndex, setActiveIndex, taskProgressById = {} }
   }
 
   const angleStep = 360 / tasks.length;
+  const getLayerIndex = (index) => {
+    const visualAngle = (index - activeIndex + tasks.length) * angleStep;
+    const normalizedAngle = visualAngle % 360;
+
+    if (index === activeIndex) {
+      return 30;
+    }
+
+    const radians = (normalizedAngle * Math.PI) / 180;
+    const sidePriority = 1 - Math.abs(Math.cos(radians));
+
+    return 10 + Math.round(sidePriority * 10);
+  };
 
   return (
     <div className="task-wheel">
@@ -32,6 +45,7 @@ function TaskWheel({ tasks, activeIndex, setActiveIndex, taskProgressById = {} }
               style={{
                 transform: `rotate(${angle}deg) translate(0, calc(-1 * var(--wheel-radius, 155px))) rotate(${-angle + activeIndex * angleStep}deg)`,
                 "--task-progress": `${progress.percent}%`,
+                zIndex: getLayerIndex(index),
               }}
               onClick={() => setActiveIndex(index)}
             >
