@@ -725,7 +725,7 @@ button {
 
 .timer-display {
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1.18fr) repeat(2, minmax(0, 1fr));
   gap: 11px;
   margin-bottom: 24px;
 }
@@ -748,11 +748,15 @@ button {
 
 .timer-value,
 .timer-value-small {
+  display: block;
+  max-width: 100%;
   color: #123352;
   font-family: "Courier New", ui-monospace, monospace;
   font-weight: 900;
   letter-spacing: 0;
-  white-space: nowrap;
+  line-height: 1.05;
+  overflow-wrap: anywhere;
+  text-align: center;
 }
 
 .timer-section:first-child .timer-value,
@@ -761,11 +765,11 @@ button {
 }
 
 .timer-value {
-  font-size: clamp(32px, 4.1vw, 48px);
+  font-size: clamp(30px, 3.4vw, 46px);
 }
 
 .timer-value-small {
-  font-size: clamp(22px, 2.4vw, 30px);
+  font-size: clamp(20px, 1.75vw, 25px);
 }
 
 .timer-label {
@@ -1230,6 +1234,17 @@ button {
     max-width: 820px;
     justify-self: center;
     width: 100%;
+  }
+}
+
+@media (min-width: 761px) and (max-width: 1320px) {
+  .timer-display {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .timer-section:first-child {
+    grid-column: 1 / -1;
+    grid-row: auto;
   }
 }
 
@@ -1973,11 +1988,11 @@ button {
   }
 
   .timer-value {
-    font-size: 34px;
+    font-size: clamp(30px, 9vw, 34px);
   }
 
   .timer-value-small {
-    font-size: 22px;
+    font-size: clamp(18px, 5.8vw, 22px);
   }
 
   .subtask-header {
