@@ -144,6 +144,7 @@ function App() {
   const [showSubWheel, setShowSubWheel] = useState(false);
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [newTaskForm, setNewTaskForm] = useState(emptyTaskForm);
+  const [activeView, setActiveView] = useState("today");
   const [runningSession, setRunningSession] = useState(
     bootstrap.initialRunningSession
   );
@@ -780,27 +781,37 @@ function App() {
         </header>
 
         <nav className="top-menu" aria-label="Główne">
-          <button className="active">
+          <button
+            type="button"
+            className={activeView === "today" ? "active" : ""}
+            aria-current={activeView === "today" ? "page" : undefined}
+            onClick={() => setActiveView("today")}
+          >
             <span className="nav-icon" aria-hidden="true">🏠</span>
             <span className="nav-label">Dzisiaj</span>
           </button>
-          <button>
+          <button type="button">
             <span className="nav-icon" aria-hidden="true">🔁</span>
             <span className="nav-label">Moje cykle</span>
           </button>
-          <button>
+          <button type="button">
             <span className="nav-icon" aria-hidden="true">📅</span>
             <span className="nav-label">Kalendarz</span>
           </button>
-          <button>
+          <button
+            type="button"
+            className={activeView === "stats" ? "active" : ""}
+            aria-current={activeView === "stats" ? "page" : undefined}
+            onClick={() => setActiveView("stats")}
+          >
             <span className="nav-icon" aria-hidden="true">📊</span>
             <span className="nav-label">Statystyki</span>
           </button>
-          <button>
+          <button type="button">
             <span className="nav-icon" aria-hidden="true">🕘</span>
             <span className="nav-label">Historia</span>
           </button>
-          <button>
+          <button type="button">
             <span className="nav-icon" aria-hidden="true">⚙️</span>
             <span className="nav-label">Ustawienia</span>
           </button>
@@ -812,14 +823,15 @@ function App() {
           </div>
         )}
 
-        <section className="content">
-          <div className="wheel-area">
-            <TaskWheel
-              tasks={visibleTasks}
-              activeIndex={activeIndex}
-              setActiveIndex={selectTask}
-              taskProgressById={taskProgressById}
-            />
+        {activeView === "today" && (
+          <section className="content">
+            <div className="wheel-area">
+              <TaskWheel
+                tasks={visibleTasks}
+                activeIndex={activeIndex}
+                setActiveIndex={selectTask}
+                taskProgressById={taskProgressById}
+              />
 
             <div className="progress-card legend-card">
               <div className="legend-header">
@@ -954,108 +966,111 @@ function App() {
                   ))}
                 </div>
               )}
+              </div>
             </div>
-          </div>
 
-          {activeTask ? (
-            <TaskPanel
-              key={activeTask.id}
-              task={activeTask}
-              finishTask={finishTask}
-              hideTask={hideTask}
-              deleteTask={deleteTask}
-              addSubtask={addSubtask}
-              deleteSubtask={deleteSubtask}
-              updateTask={updateTask}
-              updateSubtask={updateSubtask}
-              toggleSubtask={toggleSubtask}
-              activateSubtask={activateSubtask}
-              showSubWheel={showSubWheel}
-              setShowSubWheel={setShowSubWheel}
-              sessionStartTime={sessionStartTime}
-              elapsedTime={
-                runningSession?.taskId === activeTask.id
-                  ? runningSessionElapsed
-                  : 0
-              }
-              dailyTotalSaved={dailyTotalSaved}
-              dailyTotalSavedForTask={dailyTotalSavedForTask}
-              taskProgress={taskProgressById[activeTask.id]}
-              activeSubtaskId={
-                runningSession?.taskId === activeTask.id
-                  ? runningSession.subtaskId
-                  : null
-              }
-              subtaskProgressById={subtaskProgressById}
-            />
-          ) : (
-            <aside className="task-panel">
-              <h2>Brak zadań</h2>
-              <p className="empty">Dodaj zadania, aby rozpocząć cykl.</p>
-              <form className="edit-form task-edit-form" onSubmit={addTask}>
-                <label>
-                  <span>Nazwa taska</span>
-                  <input
-                    value={newTaskForm.title}
-                    onChange={(event) =>
-                      updateNewTaskFormField("title", event.target.value)
-                    }
-                  />
-                </label>
-                <div className="compact-form-row">
+            {activeTask ? (
+              <TaskPanel
+                key={activeTask.id}
+                task={activeTask}
+                finishTask={finishTask}
+                hideTask={hideTask}
+                deleteTask={deleteTask}
+                addSubtask={addSubtask}
+                deleteSubtask={deleteSubtask}
+                updateTask={updateTask}
+                updateSubtask={updateSubtask}
+                toggleSubtask={toggleSubtask}
+                activateSubtask={activateSubtask}
+                showSubWheel={showSubWheel}
+                setShowSubWheel={setShowSubWheel}
+                sessionStartTime={sessionStartTime}
+                elapsedTime={
+                  runningSession?.taskId === activeTask.id
+                    ? runningSessionElapsed
+                    : 0
+                }
+                dailyTotalSaved={dailyTotalSaved}
+                dailyTotalSavedForTask={dailyTotalSavedForTask}
+                taskProgress={taskProgressById[activeTask.id]}
+                activeSubtaskId={
+                  runningSession?.taskId === activeTask.id
+                    ? runningSession.subtaskId
+                    : null
+                }
+                subtaskProgressById={subtaskProgressById}
+              />
+            ) : (
+              <aside className="task-panel">
+                <h2>Brak zadań</h2>
+                <p className="empty">Dodaj zadania, aby rozpocząć cykl.</p>
+                <form className="edit-form task-edit-form" onSubmit={addTask}>
                   <label>
-                    <span>Ikona</span>
+                    <span>Nazwa taska</span>
                     <input
-                      className="icon-input"
-                      value={newTaskForm.icon}
+                      value={newTaskForm.title}
                       onChange={(event) =>
-                        updateNewTaskFormField("icon", event.target.value)
+                        updateNewTaskFormField("title", event.target.value)
                       }
                     />
                   </label>
-                  <label>
-                    <span>Minuty</span>
-                    <input
-                      type="number"
-                      min="0"
-                      step="5"
-                      value={newTaskForm.targetMinutes}
-                      onChange={(event) =>
-                        updateNewTaskFormField(
-                          "targetMinutes",
-                          event.target.value
-                        )
-                      }
-                    />
-                  </label>
-                </div>
-                <div className="edit-actions">
-                  <button
-                    type="button"
-                    onClick={() => setNewTaskForm(emptyTaskForm)}
-                  >
-                    Wyczyść
-                  </button>
-                  <button type="submit">Dodaj task</button>
-                </div>
-              </form>
-            </aside>
-          )}
-        </section>
+                  <div className="compact-form-row">
+                    <label>
+                      <span>Ikona</span>
+                      <input
+                        className="icon-input"
+                        value={newTaskForm.icon}
+                        onChange={(event) =>
+                          updateNewTaskFormField("icon", event.target.value)
+                        }
+                      />
+                    </label>
+                    <label>
+                      <span>Minuty</span>
+                      <input
+                        type="number"
+                        min="0"
+                        step="5"
+                        value={newTaskForm.targetMinutes}
+                        onChange={(event) =>
+                          updateNewTaskFormField(
+                            "targetMinutes",
+                            event.target.value
+                          )
+                        }
+                      />
+                    </label>
+                  </div>
+                  <div className="edit-actions">
+                    <button
+                      type="button"
+                      onClick={() => setNewTaskForm(emptyTaskForm)}
+                    >
+                      Wyczyść
+                    </button>
+                    <button type="submit">Dodaj task</button>
+                  </div>
+                </form>
+              </aside>
+            )}
+          </section>
+        )}
 
-        {showSubWheel && activeTask && activeTask.subtasks.length > 0 && (
+        {activeView === "today" && showSubWheel && activeTask && activeTask.subtasks.length > 0 && (
           <section className="subtask-section">
             <h2>Podzadania jako koło</h2>
             <SubtaskWheel subtasks={activeTask.subtasks} />
           </section>
         )}
-        <StatsPanel
-          stats={stats}
-          taskStats={taskStats}
-          completedTasks={completedTasks}
-          visibleTaskCount={visibleTasks.length}
-          hiddenTaskCount={hiddenTasks.length}
-        />
+        {activeView === "stats" && (
+          <StatsPanel
+            stats={stats}
+            taskStats={taskStats}
+            completedTasks={completedTasks}
+            visibleTaskCount={visibleTasks.length}
+            hiddenTaskCount={hiddenTasks.length}
+          />
+        )}
       </main>
     </div>
   );

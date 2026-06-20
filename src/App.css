@@ -1071,6 +1071,30 @@ button {
   padding: clamp(20px, 2vw, 28px);
 }
 
+.stats-section {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 14% 4%, rgba(35, 196, 186, 0.16), transparent 13rem),
+    radial-gradient(circle at 92% 10%, rgba(138, 216, 255, 0.22), transparent 14rem),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.94), rgba(245, 250, 255, 0.88));
+}
+
+.stats-section::before {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(120deg, rgba(255, 255, 255, 0.72), transparent 38%),
+    radial-gradient(circle at 86% 84%, rgba(255, 211, 77, 0.12), transparent 12rem);
+  content: "";
+}
+
+.stats-section > * {
+  position: relative;
+  z-index: 1;
+}
+
 .subtask-section h2 {
   margin: 0 0 20px;
 }
@@ -1143,8 +1167,11 @@ button {
 }
 
 .stats-header > strong {
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(35, 196, 186, 0.18), rgba(35, 119, 230, 0.16));
   color: var(--blue-dark);
   font-size: 36px;
+  padding: 8px 13px;
 }
 
 .stats-grid {
@@ -1154,18 +1181,50 @@ button {
 }
 
 .stat-box {
+  position: relative;
+  overflow: hidden;
   min-width: 0;
   border: 1px solid rgba(220, 231, 243, 0.86);
   border-radius: 18px;
-  background: rgba(248, 252, 255, 0.78);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(237, 248, 255, 0.84));
+  box-shadow: 0 14px 34px rgba(28, 78, 126, 0.08);
   padding: 15px;
 }
 
+.stat-box::after {
+  position: absolute;
+  inset: auto -20% -48% 30%;
+  height: 86px;
+  border-radius: 999px;
+  background: rgba(35, 196, 186, 0.18);
+  content: "";
+}
+
+.stat-box:nth-child(2)::after {
+  background: rgba(35, 119, 230, 0.15);
+}
+
+.stat-box:nth-child(3)::after {
+  background: rgba(255, 211, 77, 0.2);
+}
+
+.stat-box:nth-child(4)::after {
+  background: rgba(65, 189, 115, 0.16);
+}
+
 .stat-box strong {
+  position: relative;
+  z-index: 1;
   display: block;
   color: #0b2440;
   font-size: 23px;
   overflow-wrap: anywhere;
+}
+
+.stat-box span {
+  position: relative;
+  z-index: 1;
 }
 
 .stats-meta {
@@ -1176,7 +1235,8 @@ button {
 
 .stats-meta span {
   border-radius: 999px;
-  background: #edf8ff;
+  background: linear-gradient(135deg, rgba(237, 248, 255, 0.92), rgba(235, 255, 252, 0.88));
+  box-shadow: inset 0 0 0 1px rgba(138, 216, 255, 0.3);
   color: #155d8a;
   font-size: 12px;
   font-weight: 850;
@@ -1191,7 +1251,9 @@ button {
 .stats-task-row {
   border: 1px solid rgba(220, 231, 243, 0.86);
   border-radius: 17px;
-  background: rgba(255, 255, 255, 0.62);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.82), rgba(244, 251, 255, 0.72));
+  box-shadow: 0 10px 24px rgba(28, 78, 126, 0.06);
   padding: 13px;
 }
 
@@ -1213,7 +1275,13 @@ button {
 
 .stats-task-bar {
   height: 8px;
+  background: rgba(226, 235, 244, 0.92);
   margin: 10px 0 8px;
+}
+
+.stats-task-bar div {
+  background: linear-gradient(90deg, var(--teal), var(--blue), var(--yellow));
+  box-shadow: 0 0 12px rgba(35, 196, 186, 0.24);
 }
 
 .stats-task-row small {
@@ -2063,7 +2131,6 @@ button {
     opacity: 1;
   }
 
-  .stats-section,
   .subtask-section {
     display: none;
   }
