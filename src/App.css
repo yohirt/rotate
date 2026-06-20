@@ -2,12 +2,17 @@
   box-sizing: border-box;
 }
 
+html {
+  overflow-x: hidden;
+}
+
 body {
   margin: 0;
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
   background: #f4f7fb;
   color: #111827;
+  overflow-x: hidden;
 }
 
 button {
@@ -17,6 +22,7 @@ button {
 .app {
   display: flex;
   min-height: 100vh;
+  min-width: 0;
 }
 
 /* SIDEBAR */
@@ -98,6 +104,7 @@ button {
 .main {
   flex: 1;
   padding: 28px;
+  min-width: 0;
 }
 
 .topbar {
@@ -126,7 +133,7 @@ button {
 
 .content {
   display: grid;
-  grid-template-columns: minmax(520px, 1fr) 420px;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 420px);
   gap: 32px;
 }
 
@@ -136,8 +143,12 @@ button {
   background: linear-gradient(135deg, #ffffff, #f7f9ff);
   border-radius: 28px;
   box-shadow: 0 24px 70px rgba(27, 39, 94, 0.08);
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  padding: 32px;
   overflow: hidden;
 }
 
@@ -145,8 +156,10 @@ button {
 
 .task-wheel {
   position: relative;
+  --wheel-radius: 155px;
   width: 560px;
   height: 560px;
+  max-width: 100%;
   border-radius: 50%;
   background:
     radial-gradient(circle at center, white 0 32%, transparent 33%),
@@ -296,7 +309,7 @@ button {
   /* position: absolute; */
   left: 32px;
   bottom: 32px;
-  width: 230px;
+  width: min(100%, 280px);
   background: white;
   padding: 18px;
   border-radius: 18px;
@@ -693,52 +706,205 @@ button {
 
 @media (max-width: 650px) {
   .main {
-    padding: 16px;
+    padding: 12px;
   }
 
   .topbar {
     align-items: flex-start;
     gap: 12px;
     flex-direction: column;
+    margin-bottom: 16px;
+  }
+
+  .topbar > div,
+  .topbar-actions {
+    width: 100%;
+  }
+
+  .topbar-actions {
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 14px;
+  }
+
+  .content {
+    gap: 16px;
+  }
+
+  .wheel-area {
+    min-height: auto;
+    padding: 18px 12px;
+    border-radius: 20px;
+    overflow: visible;
   }
 
   .task-wheel {
-    width: 360px;
-    height: 360px;
+    --wheel-radius: 112px;
+    width: min(100%, 340px);
+    height: auto;
+    aspect-ratio: 1;
   }
 
   .wheel-item {
-    width: 105px;
-    min-height: 86px;
-    margin-left: -52px;
-    margin-top: -43px;
+    width: 92px;
+    min-height: 76px;
+    margin-left: -46px;
+    margin-top: -38px;
     transform-origin: center;
-    padding: 14px 8px 8px;
+    padding: 13px 7px 7px;
+    border-radius: 16px;
+    gap: 2px;
+  }
+
+  .task-number {
+    top: -12px;
+    padding: 4px 7px;
+    font-size: 10px;
   }
 
   .wheel-item strong {
-    font-size: 10px;
+    font-size: 9px;
+    line-height: 1.15;
+    max-width: 78px;
+    overflow-wrap: anywhere;
   }
 
   .task-percent,
   .task-time-progress {
-    font-size: 9px;
+    font-size: 8px;
   }
 
   .task-icon {
-    font-size: 18px;
+    font-size: 16px;
   }
 
   .wheel-center {
-    width: 150px;
-    height: 150px;
+    width: 132px;
+    height: 132px;
+    padding: 16px;
   }
 
   .wheel-center h1 {
-    font-size: 16px;
+    font-size: 14px;
+    overflow-wrap: anywhere;
+  }
+
+  .wheel-center small {
+    font-size: 9px;
+  }
+
+  .progress-card {
+    width: 100%;
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .task-panel {
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .panel-icon {
+    font-size: 26px;
+  }
+
+  .task-panel h2 {
+    font-size: 22px;
+    margin-bottom: 12px;
+    overflow-wrap: anywhere;
+  }
+
+  .task-goal {
+    align-items: flex-start;
+  }
+
+  .task-goal > strong {
+    font-size: 24px;
+  }
+
+  .timer-display {
+    grid-template-columns: 1fr;
+    display: grid;
+    gap: 14px;
+    padding: 18px;
+    border-radius: 14px;
+  }
+
+  .timer-value {
+    font-size: 38px;
+  }
+
+  .timer-value-small {
+    font-size: 26px;
+  }
+
+  .timer-label {
+    font-size: 10px;
+    letter-spacing: 0.5px;
+  }
+
+  .subtask-header {
+    gap: 8px;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .subtask-list {
+    gap: 10px;
+  }
+
+  .subtask-list li {
+    padding: 10px 8px;
+  }
+
+  .subtask-title-row {
+    font-size: 14px;
+  }
+
+  .subtask-section {
+    margin-top: 16px;
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .subtask-wheel {
+    width: min(100%, 300px);
+    height: auto;
+    aspect-ratio: 1;
+    margin: 24px auto;
   }
 
   .panel-actions {
     grid-template-columns: 1fr;
+    gap: 10px;
+    margin-top: 24px;
+  }
+
+  .panel-actions button {
+    min-height: 48px;
+    padding: 14px;
+  }
+}
+
+@media (max-width: 390px) {
+  .task-wheel {
+    --wheel-radius: 98px;
+    width: min(100%, 310px);
+  }
+
+  .wheel-item {
+    width: 82px;
+    min-height: 70px;
+    margin-left: -41px;
+    margin-top: -35px;
+  }
+
+  .wheel-center {
+    width: 118px;
+    height: 118px;
+  }
+
+  .wheel-center h1 {
+    font-size: 12px;
   }
 }

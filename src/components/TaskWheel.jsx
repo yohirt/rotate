@@ -30,7 +30,7 @@ function TaskWheel({ tasks, activeIndex, setActiveIndex, taskProgressById = {} }
                 index === activeIndex ? "active" : ""
               } ${task.done ? "done" : ""}`}
               style={{
-                transform: `rotate(${angle}deg) translate(0, -155px) rotate(${-angle + activeIndex * angleStep}deg)`,
+                transform: `rotate(${angle}deg) translate(0, calc(-1 * var(--wheel-radius, 155px))) rotate(${-angle + activeIndex * angleStep}deg)`,
                 "--task-progress": `${progress.percent}%`,
               }}
               onClick={() => setActiveIndex(index)}
