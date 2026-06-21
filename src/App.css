@@ -334,7 +334,6 @@ button {
   width: min(100%, 590px);
   height: auto;
   aspect-ratio: 1;
-  --wheel-radius: 170px;
   border: 1px solid rgba(216, 230, 244, 0.95);
   border-radius: 999px;
   background:
@@ -1433,7 +1432,6 @@ button {
 
   .task-wheel {
     width: min(100%, 360px);
-    --wheel-radius: 122px;
   }
 
   .wheel-item {
@@ -1568,7 +1566,6 @@ button {
 @media (max-width: 390px) {
   .task-wheel {
     width: min(100%, 326px);
-    --wheel-radius: 108px;
   }
 
   .wheel-item {
@@ -1616,7 +1613,6 @@ button {
 
 .task-wheel {
   width: min(100%, 430px);
-  --wheel-radius: clamp(112px, 31vw, 146px);
   border: 0;
   background: transparent;
   box-shadow: none;
@@ -1682,8 +1678,7 @@ button {
   min-height: 66px;
   height: 66px;
   overflow: visible;
-  margin-left: -33px;
-  margin-top: -33px;
+  margin: 0;
   border: 0;
   border-radius: 999px;
   background: transparent;
@@ -2099,7 +2094,6 @@ button {
 
   .task-wheel {
     width: min(100vw - 18px, 410px);
-    --wheel-radius: min(32vw, 126px);
   }
 
   .task-icon {
@@ -2253,7 +2247,6 @@ button {
 @media (max-width: 390px) {
   .task-wheel {
     width: min(100vw - 14px, 372px);
-    --wheel-radius: min(31vw, 112px);
   }
 
   .task-icon {

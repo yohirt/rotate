@@ -47,6 +47,31 @@ const describeProgressSegment = (centerAngle, angleStep, percent) => {
   return describeSegment(centerAngle, angleStep, progressRadius, innerRadius);
 };
 
+const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
+const getIconOrbitRadius = (taskCount) => {
+  const angleStep = 360 / taskCount;
+  const gap = Math.min(3, angleStep * 0.16);
+  const innerRadius = 19;
+  const outerRadius = 48;
+  const iconHalfSize = 8.8;
+  const padding = 1.3;
+  const segmentAngle = ((angleStep - gap * 2) * Math.PI) / 180;
+  const annularCentroidRadius =
+    ((2 / 3) *
+      (outerRadius ** 3 - innerRadius ** 3) /
+      (outerRadius ** 2 - innerRadius ** 2) *
+      Math.sin(segmentAngle / 2)) /
+    (segmentAngle / 2);
+  const minimumRadius = innerRadius + iconHalfSize + padding;
+  const maximumRadius = outerRadius - iconHalfSize - padding;
+  const outwardBalance = taskCount >= 8 ? 1 : 1.8;
+
+  return clamp(annularCentroidRadius + outwardBalance, minimumRadius, maximumRadius);
+};
+
+const ICON_VERTICAL_OFFSET = -3;
+
 function TaskWheel({
   tasks,
   activeIndex,
@@ -61,6 +86,7 @@ function TaskWheel({
 
   const angleStep = 360 / tasks.length;
   const taskColors = tasks.map((task, index) => getTaskColor(task, index));
+  const iconOrbitRadius = getIconOrbitRadius(tasks.length);
   const activeTask = tasks[activeIndex];
   const activeProgress = taskProgressById[activeTask.id] ?? {
     percent: 0,
@@ -121,6 +147,7 @@ function TaskWheel({
 
         {tasks.map((task, index) => {
           const angle = index * angleStep;
+          const iconPosition = polarToCartesian(angle, iconOrbitRadius);
           const progress = taskProgressById[task.id] ?? {
             percent: 0,
             spentSeconds: 0,
@@ -138,7 +165,9 @@ function TaskWheel({
             )} z ${formatDuration(progress.targetSeconds)}`}
             title={`${task.title} - ${progress.percent}%`}
             style={{
-              transform: `rotate(${angle}deg) translate(0, calc(-1 * var(--wheel-radius, 155px))) rotate(${-angle + activeIndex * angleStep}deg)`,
+              left: `calc(${iconPosition.x}% + 4px)`,
+              top: `calc(${iconPosition.y + ICON_VERTICAL_OFFSET}% + 1px)`,
+              transform: `translate(-50%, -50%) rotate(${activeIndex * angleStep}deg)`,
               "--task-progress": `${progress.percent}%`,
               "--item-color": taskColors[index],
               zIndex: index === activeIndex ? 30 : 20,
