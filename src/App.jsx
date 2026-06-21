@@ -226,7 +226,7 @@ function App() {
     oscillator.type = "sine";
     oscillator.frequency.setValueAtTime(frequency, startTime);
     gain.gain.setValueAtTime(0.0001, startTime);
-    gain.gain.exponentialRampToValueAtTime(0.16, startTime + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.28, startTime + 0.015);
     gain.gain.exponentialRampToValueAtTime(0.0001, endTime);
 
     oscillator.connect(gain);
