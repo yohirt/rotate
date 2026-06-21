@@ -178,7 +178,9 @@ function TaskWheel({
             <span className="wheel-item-fill" aria-hidden="true">
               <span style={{ height: `${progress.percent}%` }}></span>
             </span>
-            <span className="task-icon">{task.icon}</span>
+            <span className="task-icon">
+              <span className="task-icon-glyph">{task.icon}</span>
+            </span>
             <strong>{task.title}</strong>
             <span className="task-percent">{progress.percent}%</span>
             <span className="task-time-progress" aria-hidden="true">

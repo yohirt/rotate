@@ -1616,6 +1616,8 @@ button {
   border: 0;
   background: transparent;
   box-shadow: none;
+  contain: layout paint style;
+  transform: translateZ(0);
 }
 
 .wheel-segments {
@@ -1624,6 +1626,7 @@ button {
   overflow: visible;
   border-radius: 50%;
   filter: drop-shadow(0 24px 28px rgba(41, 67, 98, 0.14));
+  transform: translateZ(0);
 }
 
 .wheel-segments path {
@@ -1671,6 +1674,9 @@ button {
 
 .wheel-rotator {
   inset: 0;
+  backface-visibility: hidden;
+  transform-origin: center;
+  will-change: transform;
 }
 
 .wheel-item {
@@ -1689,6 +1695,15 @@ button {
   transition:
     filter 0.2s ease,
     transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+  backface-visibility: hidden;
+  contain: layout;
+  will-change: transform;
+}
+
+@media (max-width: 760px) {
+  .wheel-item {
+    contain: layout paint;
+  }
 }
 
 .wheel-item:hover,
@@ -1713,24 +1728,42 @@ button {
 }
 
 .task-icon {
+  display: grid;
+  place-items: center;
   width: 58px;
   height: 58px;
   border: 0;
   border-radius: 18px;
   background: transparent;
-  box-shadow:
-    0 10px 16px rgba(20, 54, 92, 0.18),
-    0 1px 0 rgba(255, 255, 255, 0.5);
+  box-shadow: none;
   font-size: 34px;
   text-shadow: 0 2px 4px rgba(15, 36, 64, 0.18);
   transform: translateY(var(--icon-y-offset, 0));
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+.task-icon-glyph {
+  display: block;
+  line-height: 1;
+}
+
+@media (min-width: 761px) {
+  .task-icon-glyph {
+    transform: translateY(1px);
+  }
 }
 
 .wheel-item.active .task-icon {
   box-shadow:
-    inset 0 0 0 4px rgba(255, 255, 255, 0.92),
-    0 10px 16px rgba(20, 54, 92, 0.18),
-    0 1px 0 rgba(255, 255, 255, 0.5);
+    inset 0 0 0 3px rgba(255, 255, 255, 0.9),
+    0 5px 12px rgba(20, 54, 92, 0.1);
+}
+
+@media (min-width: 761px) {
+  .wheel-item:first-of-type.active .task-icon {
+    transform: translateY(calc(var(--icon-y-offset, 0) - 1px));
+  }
 }
 
 .wheel-center {
@@ -2091,8 +2124,24 @@ button {
     border-radius: 0;
     background: transparent;
     box-shadow: none;
+    backdrop-filter: none;
     padding: 6px 0 0;
     gap: 20px;
+  }
+
+  .topbar,
+  .top-menu,
+  .task-panel,
+  .progress-card {
+    backdrop-filter: none;
+  }
+
+  .wheel-segments {
+    filter: none;
+  }
+
+  .wheel-segments g.active .segment-progress {
+    filter: none;
   }
 
   .task-wheel {
@@ -2103,6 +2152,25 @@ button {
     width: 52px;
     height: 52px;
     font-size: 30px;
+    box-shadow: 0 6px 12px rgba(20, 54, 92, 0.12);
+    text-shadow: none;
+  }
+
+  .wheel-item:hover,
+  .wheel-item.active {
+    filter: none;
+  }
+
+  .wheel-item.active .task-icon {
+    box-shadow:
+      inset 0 0 0 3px rgba(255, 255, 255, 0.92),
+      0 6px 12px rgba(20, 54, 92, 0.12);
+  }
+
+  .wheel-center::before {
+    box-shadow:
+      inset 0 0 0 14px #ffffff,
+      0 6px 14px rgba(28, 63, 96, 0.08);
   }
 
   .wheel-center {
