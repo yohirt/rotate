@@ -314,6 +314,15 @@ function App() {
     setSessionStartTime(startedAt);
   };
 
+  const pauseRunningSession = () => {
+    if (!runningSession) {
+      return;
+    }
+
+    stopRunningSession(new Date());
+    setSessionStartTime(null);
+  };
+
   const visibleTasks = tasks.filter((task) => !task.hidden);
   const hiddenTasks = tasks.filter((task) => task.hidden);
   const activeTask = visibleTasks[activeIndex] ?? null;
@@ -886,6 +895,10 @@ function App() {
                 activeIndex={activeIndex}
                 setActiveIndex={selectTask}
                 taskProgressById={taskProgressById}
+                isActiveTaskRunning={
+                  activeTask ? runningSession?.taskId === activeTask.id : false
+                }
+                pauseRunningSession={pauseRunningSession}
               />
 
             <div className="progress-card legend-card">

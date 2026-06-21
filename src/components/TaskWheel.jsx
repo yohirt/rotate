@@ -47,13 +47,30 @@ const describeProgressSegment = (centerAngle, angleStep, percent) => {
   return describeSegment(centerAngle, angleStep, progressRadius, innerRadius);
 };
 
-function TaskWheel({ tasks, activeIndex, setActiveIndex, taskProgressById = {} }) {
+function TaskWheel({
+  tasks,
+  activeIndex,
+  setActiveIndex,
+  taskProgressById = {},
+  isActiveTaskRunning = false,
+  pauseRunningSession,
+}) {
   if (tasks.length === 0) {
     return null;
   }
 
   const angleStep = 360 / tasks.length;
   const taskColors = tasks.map((task, index) => getTaskColor(task, index));
+  const activeTask = tasks[activeIndex];
+  const activeProgress = taskProgressById[activeTask.id] ?? {
+    percent: 0,
+    spentSeconds: 0,
+    targetSeconds: 0,
+  };
+  const remainingSeconds = Math.max(
+    activeProgress.targetSeconds - activeProgress.spentSeconds,
+    0
+  );
 
   return (
     <div
@@ -144,10 +161,24 @@ function TaskWheel({ tasks, activeIndex, setActiveIndex, taskProgressById = {} }
       </div>
 
       <div className="wheel-center">
-        <span className="play-symbol" aria-hidden="true"></span>
         <span className="center-progress" aria-hidden="true"></span>
-        <h1>{tasks[activeIndex].title}</h1>
-        <p>{taskProgressById[tasks[activeIndex].id]?.percent ?? 0}% celu</p>
+        <button
+          type="button"
+          className={`center-time ${isActiveTaskRunning ? "running" : ""}`}
+          onClick={isActiveTaskRunning ? pauseRunningSession : undefined}
+          disabled={!isActiveTaskRunning}
+          aria-label={
+            isActiveTaskRunning
+              ? "Pauzuj odliczanie czasu"
+              : "Czas pozostaly do celu taska"
+          }
+          title={isActiveTaskRunning ? "Pauza" : "Czas pozostaly"}
+        >
+          {formatDuration(remainingSeconds)}
+        </button>
+        {/* <span className="center-label">pozostało</span> */}
+        <h1>{activeTask.title}</h1>
+        <p>{activeProgress.percent}% celu</p>
       </div>
     </div>
   );
