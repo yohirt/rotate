@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import TaskPanel from "./components/TaskPanel";
 import StatsPanel from "./components/StatsPanel";
 import TaskWheel from "./components/TaskWheel";
@@ -81,7 +81,18 @@ const resetTaskForDate = (task, dateKey) => ({
   sessions: (task.sessions || []).filter((session) => session.date !== dateKey),
 });
 
+const TASK_SOUND_ALERTS = [
+  { thresholdSeconds: 5 * 60, beepCount: 5 },
+  { thresholdSeconds: 3 * 60, beepCount: 3 },
+  { thresholdSeconds: 2 * 60, beepCount: 2 },
+  { thresholdSeconds: 60, beepCount: 1 },
+];
+
 function App() {
+  const audioContextRef = useRef(null);
+  const playedSoundKeysRef = useRef(new Set());
+  const previousRemainingSecondsRef = useRef(null);
+  const soundSessionKeyRef = useRef(null);
   const [installPrompt, setInstallPrompt] = useState(() => pendingInstallPrompt);
   const [installNotice, setInstallNotice] = useState("");
   const [isInstalled, setIsInstalled] = useState(() => {
@@ -162,6 +173,66 @@ function App() {
     bootstrap.initialSessionStartTime
   );
   const [currentTime, setCurrentTime] = useState(() => new Date());
+
+  const getAudioContext = useCallback(() => {
+    if (typeof window === "undefined") {
+      return null;
+    }
+
+    const AudioContextConstructor =
+      window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextConstructor) {
+      return null;
+    }
+
+    if (!audioContextRef.current) {
+      audioContextRef.current = new AudioContextConstructor();
+    }
+
+    if (audioContextRef.current.state === "suspended") {
+      audioContextRef.current.resume();
+    }
+
+    return audioContextRef.current;
+  }, []);
+
+  const playTone = useCallback((startOffset, duration, frequency = 880) => {
+    const audioContext = getAudioContext();
+    if (!audioContext) {
+      return;
+    }
+
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    const startTime = audioContext.currentTime + startOffset;
+    const endTime = startTime + duration;
+
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(frequency, startTime);
+    gain.gain.setValueAtTime(0.0001, startTime);
+    gain.gain.exponentialRampToValueAtTime(0.16, startTime + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.0001, endTime);
+
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+    oscillator.start(startTime);
+    oscillator.stop(endTime + 0.02);
+  }, [getAudioContext]);
+
+  const playBeeps = useCallback((count) => {
+    Array.from({ length: count }).forEach((_, index) => {
+      playTone(index * 0.22, 0.11, 920);
+    });
+  }, [playTone]);
+
+  const playCompletionSound = useCallback(() => {
+    playTone(0, 0.75, 620);
+    playTone(0.08, 0.65, 930);
+  }, [playTone]);
+
+  const playTaskSwitchSound = useCallback(() => {
+    playTone(0, 0.08, 760);
+  }, [playTone]);
 
   useEffect(() => {
     saveTasks(tasks);
@@ -303,6 +374,8 @@ function App() {
   };
 
   const startRunningSessionForTask = (taskId, startedAt, subtaskId = null) => {
+    getAudioContext();
+
     const startedSession = createSession(startedAt, subtaskId);
     const nextRunningSession = {
       taskId,
@@ -353,6 +426,10 @@ function App() {
   const taskProgressById = Object.fromEntries(
     visibleTasks.map((task) => [task.id, getTaskProgress(task)])
   );
+  const activeTaskProgress = activeTask ? taskProgressById[activeTask.id] : null;
+  const activeTaskRemainingSeconds = activeTaskProgress
+    ? Math.max(activeTaskProgress.targetSeconds - activeTaskProgress.spentSeconds, 0)
+    : 0;
   const subtaskProgressById = activeTask
     ? Object.fromEntries(
         activeTask.subtasks.map((subtask) => {
@@ -375,6 +452,66 @@ function App() {
         })
       )
     : {};
+
+  useEffect(() => {
+    if (
+      !runningSession ||
+      !activeTask ||
+      runningSession.taskId !== activeTask.id ||
+      !activeTaskProgress ||
+      activeTaskProgress.targetSeconds <= 0
+    ) {
+      previousRemainingSecondsRef.current = null;
+      soundSessionKeyRef.current = null;
+      playedSoundKeysRef.current.clear();
+      return;
+    }
+
+    const sessionKey = `${runningSession.taskId}:${runningSession.startTime}`;
+    if (soundSessionKeyRef.current !== sessionKey) {
+      soundSessionKeyRef.current = sessionKey;
+      previousRemainingSecondsRef.current = activeTaskRemainingSeconds;
+      playedSoundKeysRef.current.clear();
+      return;
+    }
+
+    const previousRemainingSeconds = previousRemainingSecondsRef.current;
+    if (previousRemainingSeconds === null) {
+      previousRemainingSecondsRef.current = activeTaskRemainingSeconds;
+      return;
+    }
+
+    TASK_SOUND_ALERTS.forEach(({ thresholdSeconds, beepCount }) => {
+      const soundKey = `${sessionKey}:${thresholdSeconds}`;
+      if (
+        previousRemainingSeconds > thresholdSeconds &&
+        activeTaskRemainingSeconds <= thresholdSeconds &&
+        !playedSoundKeysRef.current.has(soundKey)
+      ) {
+        playedSoundKeysRef.current.add(soundKey);
+        playBeeps(beepCount);
+      }
+    });
+
+    const completionSoundKey = `${sessionKey}:complete`;
+    if (
+      previousRemainingSeconds > 0 &&
+      activeTaskRemainingSeconds <= 0 &&
+      !playedSoundKeysRef.current.has(completionSoundKey)
+    ) {
+      playedSoundKeysRef.current.add(completionSoundKey);
+      playCompletionSound();
+    }
+
+    previousRemainingSecondsRef.current = activeTaskRemainingSeconds;
+  }, [
+    activeTask,
+    activeTaskProgress,
+    activeTaskRemainingSeconds,
+    playBeeps,
+    playCompletionSound,
+    runningSession,
+  ]);
 
   const totalTargetSeconds = visibleTasks.reduce(
     (sum, task) => sum + getTargetSeconds(task),
@@ -458,6 +595,8 @@ function App() {
 
       return;
     }
+
+    playTaskSwitchSound();
 
     if (runningSession) {
       stopRunningSession(now);
