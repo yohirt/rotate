@@ -42,6 +42,12 @@ const formatHeaderDate = (date) =>
     month: "long",
   });
 
+const formatHeaderTime = (date) =>
+  date.toLocaleTimeString("pl-PL", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
 const INSTALL_PROMPT_READY_EVENT = "rotate:install-prompt-ready";
 const THEME_STORAGE_KEY = "rotate.theme.v1";
 const UI_STATE_STORAGE_KEY = "rotate.ui-state.v1";
@@ -498,6 +504,7 @@ function App() {
   // Łączny czas zapisanych sesji z całego dnia (wszystkie taski)
   const today = getLocalDateKey(new Date());
   const headerDate = formatHeaderDate(currentTime);
+  const headerTime = formatHeaderTime(currentTime);
   const runningSessionElapsed = runningSession
     ? calculateElapsedSeconds(runningSession.startTime, currentTime)
     : 0;
@@ -1070,7 +1077,7 @@ function App() {
           </div>
 
           <div className="topbar-actions">
-            <span>📅 {headerDate}</span>
+            <span>📅 {headerDate} · {headerTime}</span>
             <span>📅 Środa, 22 maja</span>
             <button>🔔</button>
             <button>⋮</button>
