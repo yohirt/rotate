@@ -44,6 +44,7 @@ const formatHeaderDate = (date) =>
 
 const INSTALL_PROMPT_READY_EVENT = "rotate:install-prompt-ready";
 const THEME_STORAGE_KEY = "rotate.theme.v1";
+const UI_STATE_STORAGE_KEY = "rotate.ui-state.v1";
 let pendingInstallPrompt = null;
 
 if (typeof window !== "undefined") {
@@ -91,6 +92,38 @@ const TASK_SOUND_ALERTS = [
   { thresholdSeconds: 60, beepCount: 1 },
 ];
 
+const loadUiState = () => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    const storedState = window.localStorage.getItem(UI_STATE_STORAGE_KEY);
+    if (!storedState) {
+      return null;
+    }
+
+    const parsedState = JSON.parse(storedState);
+    return parsedState && typeof parsedState === "object" ? parsedState : null;
+  } catch {
+    return null;
+  }
+};
+
+const saveUiState = (uiState) => {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.setItem(
+    UI_STATE_STORAGE_KEY,
+    JSON.stringify({
+      ...uiState,
+      savedAt: new Date().toISOString(),
+    })
+  );
+};
+
 function App() {
   const audioContextRef = useRef(null);
   const playedSoundKeysRef = useRef(new Set());
@@ -111,6 +144,7 @@ function App() {
   const [bootstrap] = useState(() => {
     const initialTasksState = loadTasks(initialTasks);
     const storedRunningSession = loadRunningSession();
+    const storedUiState = loadUiState();
 
     const isStoredSessionValid = storedRunningSession
       ? initialTasksState.some(
@@ -139,6 +173,10 @@ function App() {
       ? visibleInitialTasks.findIndex(
           (task) => task.id === resolvedRunningSession.taskId && !task.done
         )
+      : storedUiState?.activeTaskId
+      ? visibleInitialTasks.findIndex(
+          (task) => task.id === storedUiState.activeTaskId
+        )
       : visibleInitialTasks.findIndex((task) => !task.done);
 
     const safeActiveIndex = resolvedActiveIndex >= 0 ? resolvedActiveIndex : 0;
@@ -160,15 +198,20 @@ function App() {
       initialSessionStartTime: createdRunningSession
         ? new Date(createdRunningSession.startTime)
         : new Date(),
+      initialActiveView:
+        storedUiState?.activeView === "stats" ? "stats" : "today",
+      initialShowSubWheel: Boolean(storedUiState?.showSubWheel),
     };
   });
 
   const [tasks, setTasks] = useState(bootstrap.initialTasksState);
   const [activeIndex, setActiveIndex] = useState(bootstrap.initialActiveIndex);
-  const [showSubWheel, setShowSubWheel] = useState(false);
+  const [showSubWheel, setShowSubWheel] = useState(
+    bootstrap.initialShowSubWheel
+  );
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [newTaskForm, setNewTaskForm] = useState(emptyTaskForm);
-  const [activeView, setActiveView] = useState("today");
+  const [activeView, setActiveView] = useState(bootstrap.initialActiveView);
   const [runningSession, setRunningSession] = useState(
     bootstrap.initialRunningSession
   );
@@ -422,6 +465,35 @@ function App() {
   const hiddenTasks = tasks.filter((task) => task.hidden);
   const activeTask = visibleTasks[activeIndex] ?? null;
   const completedTasks = visibleTasks.filter((task) => task.done).length;
+
+  useEffect(() => {
+    saveUiState({
+      activeTaskId: activeTask?.id ?? null,
+      activeView,
+      showSubWheel,
+    });
+  }, [activeTask?.id, activeView, showSubWheel]);
+
+  useEffect(() => {
+    const saveStateBeforePageIsHidden = () => {
+      saveUiState({
+        activeTaskId: activeTask?.id ?? null,
+        activeView,
+        showSubWheel,
+      });
+    };
+
+    window.addEventListener("pagehide", saveStateBeforePageIsHidden);
+    document.addEventListener("visibilitychange", saveStateBeforePageIsHidden);
+
+    return () => {
+      window.removeEventListener("pagehide", saveStateBeforePageIsHidden);
+      document.removeEventListener(
+        "visibilitychange",
+        saveStateBeforePageIsHidden
+      );
+    };
+  }, [activeTask?.id, activeView, showSubWheel]);
 
   // Łączny czas zapisanych sesji z całego dnia (wszystkie taski)
   const today = getLocalDateKey(new Date());
