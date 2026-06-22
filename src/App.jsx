@@ -245,6 +245,7 @@ const getCycleSessions = (tasks, cycleStartTime) =>
 
 function App() {
   const audioContextRef = useRef(null);
+  const wakeLockRef = useRef(null);
   const playedSoundKeysRef = useRef(new Set());
   const previousRemainingSecondsRef = useRef(null);
   const soundSessionKeyRef = useRef(null);
@@ -433,6 +434,74 @@ function App() {
     }
 
     clearRunningSession();
+  }, [runningSession]);
+
+  useEffect(() => {
+    let isEffectActive = true;
+
+    const releaseWakeLock = async () => {
+      if (!wakeLockRef.current) {
+        return;
+      }
+
+      const currentWakeLock = wakeLockRef.current;
+      wakeLockRef.current = null;
+
+      try {
+        await currentWakeLock.release();
+      } catch {
+        // The browser may have already released it.
+      }
+    };
+
+    const requestWakeLock = async () => {
+      if (
+        !runningSession ||
+        typeof navigator === "undefined" ||
+        !("wakeLock" in navigator) ||
+        document.visibilityState !== "visible" ||
+        wakeLockRef.current
+      ) {
+        return;
+      }
+
+      try {
+        const wakeLock = await navigator.wakeLock.request("screen");
+        if (!isEffectActive || !runningSession) {
+          await wakeLock.release();
+          return;
+        }
+
+        wakeLockRef.current = wakeLock;
+        wakeLock.addEventListener("release", () => {
+          if (wakeLockRef.current === wakeLock) {
+            wakeLockRef.current = null;
+          }
+        });
+      } catch {
+        wakeLockRef.current = null;
+      }
+    };
+
+    if (runningSession) {
+      requestWakeLock();
+    } else {
+      releaseWakeLock();
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        requestWakeLock();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      isEffectActive = false;
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      releaseWakeLock();
+    };
   }, [runningSession]);
 
   useEffect(() => {
