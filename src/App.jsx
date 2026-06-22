@@ -1064,7 +1064,7 @@ function App() {
             </div>
 
             <div className="cycle-title">
-              <span>Mój cykl:</span>
+              {/* <span>Mój cykl:</span> */}
               <strong> Codzienna sukcesywność</strong>
             </div>
           </div>
@@ -1072,22 +1072,6 @@ function App() {
           <div className="topbar-actions">
             <span>📅 {headerDate}</span>
             <span>📅 Środa, 22 maja</span>
-            {!isInstalled && (
-              <button
-                className="install-button"
-                type="button"
-                onClick={installApp}
-              >
-                Instaluj
-              </button>
-            )}
-            <button
-              className="pwa-refresh-button"
-              type="button"
-              onClick={refreshPwaCache}
-            >
-              Odśwież PWA
-            </button>
             <button>🔔</button>
             <button>⋮</button>
           </div>
@@ -1147,15 +1131,42 @@ function App() {
           </button>
         </nav>
 
-        {installNotice && (
-          <div className="install-notice" role="status">
-            {installNotice}
-          </div>
-        )}
-
         {activeView === "today" && (
           <section className="content">
             <div className="wheel-area">
+              {activeTask && activeTaskProgress && (
+                <section className="active-task-summary" aria-live="polite">
+                  <div className="active-task-summary-main">
+                    <span className="active-task-summary-icon" aria-hidden="true">
+                      {activeTask.icon}
+                    </span>
+                    <div>
+                      <span className="active-task-summary-eyebrow">
+                        Teraz pracujesz nad
+                      </span>
+                      <strong>{activeTask.title}</strong>
+                    </div>
+                  </div>
+
+                  <div className="active-task-summary-progress">
+                    <div className="active-task-summary-meta">
+                      <span>{activeTaskProgress.percent}% celu</span>
+                      <strong>
+                        {formatDuration(activeTaskProgress.spentSeconds)} /{" "}
+                        {formatDuration(activeTaskProgress.targetSeconds)}
+                      </strong>
+                    </div>
+                    <span className="active-task-summary-bar" aria-hidden="true">
+                      <span
+                        style={{
+                          width: `${activeTaskProgress.percent}%`,
+                        }}
+                      ></span>
+                    </span>
+                  </div>
+                </section>
+              )}
+
               <TaskWheel
                 tasks={visibleTasks}
                 activeIndex={activeIndex}
@@ -1418,6 +1429,36 @@ function App() {
             hiddenTaskCount={hiddenTasks.length}
           />
         )}
+
+        <footer className="app-footer">
+          <div className="app-footer-copy">
+            <strong>Rotate PWA</strong>
+            <span>Zarządzanie instalacją i cache aplikacji.</span>
+          </div>
+          <div className="app-footer-actions">
+            {!isInstalled && (
+              <button
+                className="install-button"
+                type="button"
+                onClick={installApp}
+              >
+                Instaluj
+              </button>
+            )}
+            <button
+              className="pwa-refresh-button"
+              type="button"
+              onClick={refreshPwaCache}
+            >
+              Odśwież PWA
+            </button>
+          </div>
+          {installNotice && (
+            <div className="install-notice" role="status">
+              {installNotice}
+            </div>
+          )}
+        </footer>
       </main>
     </div>
   );

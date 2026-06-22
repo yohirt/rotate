@@ -47,7 +47,9 @@ html[data-theme="dark"] .wheel-area,
 html[data-theme="dark"] .task-panel,
 html[data-theme="dark"] .stats-section,
 html[data-theme="dark"] .subtask-section,
-html[data-theme="dark"] .progress-card {
+html[data-theme="dark"] .progress-card,
+html[data-theme="dark"] .active-task-summary,
+html[data-theme="dark"] .app-footer {
   border-color: rgba(127, 151, 180, 0.28);
   background:
     linear-gradient(145deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.01)),
@@ -70,6 +72,7 @@ html[data-theme="dark"] .top-menu {
 
 html[data-theme="dark"] .topbar-actions span,
 html[data-theme="dark"] .topbar-actions button,
+html[data-theme="dark"] .app-footer-actions button,
 html[data-theme="dark"] .meta span,
 html[data-theme="dark"] .timer-section,
 html[data-theme="dark"] .stat-box,
@@ -82,6 +85,8 @@ html[data-theme="dark"] .hidden-task-list button {
 
 html[data-theme="dark"] .logo,
 html[data-theme="dark"] .cycle-title strong,
+html[data-theme="dark"] .active-task-summary-main strong,
+html[data-theme="dark"] .app-footer-copy strong,
 html[data-theme="dark"] .task-panel h2,
 html[data-theme="dark"] .legend-header strong,
 html[data-theme="dark"] .legend-copy strong,
@@ -93,6 +98,9 @@ html[data-theme="dark"] .stats-task-title {
 }
 
 html[data-theme="dark"] .cycle-title,
+html[data-theme="dark"] .active-task-summary-eyebrow,
+html[data-theme="dark"] .active-task-summary-meta,
+html[data-theme="dark"] .app-footer-copy span,
 html[data-theme="dark"] .description,
 html[data-theme="dark"] .legend-copy small,
 html[data-theme="dark"] .timer-label,
@@ -119,6 +127,26 @@ html[data-theme="dark"] .wheel-area {
     linear-gradient(150deg, rgba(255, 158, 203, 0.08), transparent 34%),
     linear-gradient(220deg, rgba(134, 244, 216, 0.1), transparent 36%),
     linear-gradient(180deg, rgba(18, 31, 47, 0.9), rgba(10, 19, 31, 0.88));
+}
+
+html[data-theme="dark"] .active-task-summary-icon {
+  background:
+    linear-gradient(145deg, rgba(104, 167, 255, 0.18), rgba(46, 213, 201, 0.13));
+  box-shadow: inset 0 0 0 1px rgba(134, 244, 216, 0.22);
+}
+
+html[data-theme="dark"] .active-task-summary-bar {
+  background: rgba(127, 151, 180, 0.22);
+}
+
+html[data-theme="dark"] .app-footer-actions .install-button {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--blue), var(--teal));
+  color: #06131f;
+}
+
+html[data-theme="dark"] .app-footer-actions .pwa-refresh-button {
+  color: #a9f4ee;
 }
 
 html[data-theme="dark"] .wheel-segments {
