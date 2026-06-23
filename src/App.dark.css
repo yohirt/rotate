@@ -49,6 +49,7 @@ html[data-theme="dark"] .stats-section,
 html[data-theme="dark"] .subtask-section,
 html[data-theme="dark"] .progress-card,
 html[data-theme="dark"] .active-task-summary,
+html[data-theme="dark"] .mobile-cycle-plan,
 html[data-theme="dark"] .bottom-hidden-task-list,
 html[data-theme="dark"] .app-footer {
   border-color: rgba(127, 151, 180, 0.28);
@@ -79,6 +80,7 @@ html[data-theme="dark"] .timer-section,
 html[data-theme="dark"] .stat-box,
 html[data-theme="dark"] .stats-task-row,
 html[data-theme="dark"] .hidden-task-list button,
+html[data-theme="dark"] .mobile-cycle-plan-list button,
 html[data-theme="dark"] .bottom-hidden-task-list-items button {
   border-color: rgba(127, 151, 180, 0.26);
   background: rgba(18, 31, 47, 0.74);
@@ -91,6 +93,8 @@ html[data-theme="dark"] .active-task-summary-main strong,
 html[data-theme="dark"] .app-footer-copy strong,
 html[data-theme="dark"] .task-panel h2,
 html[data-theme="dark"] .cycle-actions-header strong,
+html[data-theme="dark"] .mobile-cycle-plan-header strong,
+html[data-theme="dark"] .mobile-cycle-plan-list button strong,
 html[data-theme="dark"] .task-goal strong,
 html[data-theme="dark"] .stats-header h2,
 html[data-theme="dark"] .stat-box strong,
@@ -101,6 +105,7 @@ html[data-theme="dark"] .stats-task-title {
 html[data-theme="dark"] .cycle-title,
 html[data-theme="dark"] .active-task-summary-eyebrow,
 html[data-theme="dark"] .active-task-summary-meta,
+html[data-theme="dark"] .mobile-cycle-plan-header span,
 html[data-theme="dark"] .bottom-hidden-task-list-header span,
 html[data-theme="dark"] .app-footer-copy span,
 html[data-theme="dark"] .description,
@@ -197,6 +202,15 @@ html[data-theme="dark"] .cycle-actions-header span,
 html[data-theme="dark"] .stats-header span,
 html[data-theme="dark"] .stat-box span {
   color: #8fa4bc;
+}
+
+html[data-theme="dark"] .mobile-cycle-plan-list button.active {
+  border-color: rgba(134, 244, 216, 0.28);
+  background: rgba(46, 213, 201, 0.12);
+}
+
+html[data-theme="dark"] .mobile-cycle-plan-icon {
+  background: rgba(18, 31, 47, 0.88);
 }
 
 html[data-theme="dark"] .panel-icon {

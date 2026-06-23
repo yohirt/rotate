@@ -1387,6 +1387,31 @@ function App() {
                 pauseRunningSession={pauseRunningSession}
               />
 
+              <section className="mobile-cycle-plan">
+                <div className="mobile-cycle-plan-header">
+                  <span>Plan cyklu</span>
+                  <strong>{formatDuration(totalTargetSeconds)}</strong>
+                </div>
+                <div className="mobile-cycle-plan-list">
+                  {visibleTasks.map((task, index) => (
+                    <button
+                      key={task.id}
+                      type="button"
+                      className={index === activeIndex ? "active" : ""}
+                      onClick={() => selectTask(index)}
+                    >
+                      <span className="mobile-cycle-plan-icon" aria-hidden="true">
+                        {task.icon}
+                      </span>
+                      <span className="mobile-cycle-plan-title">
+                        {task.title}
+                      </span>
+                      <strong>{formatDuration(getTargetSeconds(task))}</strong>
+                    </button>
+                  ))}
+                </div>
+              </section>
+
             <div className="progress-card cycle-actions-card">
               <div className="cycle-actions-header">
                 <span>Akcje cyklu</span>
