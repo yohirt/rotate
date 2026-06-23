@@ -1638,6 +1638,27 @@ function App() {
           />
         )}
 
+        {hiddenTasks.length > 0 && (
+          <section className="bottom-hidden-task-list">
+            <div className="bottom-hidden-task-list-header">
+              <span>Ukryte taski</span>
+              <strong>{hiddenTasks.length}</strong>
+            </div>
+            <div className="bottom-hidden-task-list-items">
+              {hiddenTasks.map((task) => (
+                <button
+                  key={task.id}
+                  type="button"
+                  onClick={() => restoreTask(task.id)}
+                >
+                  <span aria-hidden="true">{task.icon}</span>
+                  {task.title}
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
+
         <footer className="app-footer">
           <div className="app-footer-copy">
             <strong>Rotate PWA</strong>

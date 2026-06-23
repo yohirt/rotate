@@ -49,6 +49,7 @@ html[data-theme="dark"] .stats-section,
 html[data-theme="dark"] .subtask-section,
 html[data-theme="dark"] .progress-card,
 html[data-theme="dark"] .active-task-summary,
+html[data-theme="dark"] .bottom-hidden-task-list,
 html[data-theme="dark"] .app-footer {
   border-color: rgba(127, 151, 180, 0.28);
   background:
@@ -77,7 +78,8 @@ html[data-theme="dark"] .meta span,
 html[data-theme="dark"] .timer-section,
 html[data-theme="dark"] .stat-box,
 html[data-theme="dark"] .stats-task-row,
-html[data-theme="dark"] .hidden-task-list button {
+html[data-theme="dark"] .hidden-task-list button,
+html[data-theme="dark"] .bottom-hidden-task-list-items button {
   border-color: rgba(127, 151, 180, 0.26);
   background: rgba(18, 31, 47, 0.74);
   color: #d6e6f7;
@@ -100,6 +102,7 @@ html[data-theme="dark"] .stats-task-title {
 html[data-theme="dark"] .cycle-title,
 html[data-theme="dark"] .active-task-summary-eyebrow,
 html[data-theme="dark"] .active-task-summary-meta,
+html[data-theme="dark"] .bottom-hidden-task-list-header span,
 html[data-theme="dark"] .app-footer-copy span,
 html[data-theme="dark"] .description,
 html[data-theme="dark"] .legend-copy small,
