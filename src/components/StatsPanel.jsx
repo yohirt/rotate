@@ -1,8 +1,11 @@
-import { formatDuration } from "../utils/sessionTracker";
+import { formatDuration, STATS_RANGE_OPTIONS } from "../utils/sessionTracker";
 
 function StatsPanel({
   stats,
   taskStats,
+  rangeId,
+  rangeLabel,
+  onRangeChange,
   completedTasks,
   visibleTaskCount,
   hiddenTaskCount,
@@ -14,9 +17,22 @@ function StatsPanel({
       <div className="stats-header">
         <div>
           <span>Statystyki</span>
-          <h2>Bieżący cykl</h2>
+          <h2>{rangeLabel}</h2>
         </div>
         <strong>{stats.progressPercent}%</strong>
+      </div>
+
+      <div className="stats-range-tabs" aria-label="Zakres statystyk">
+        {STATS_RANGE_OPTIONS.map((range) => (
+          <button
+            key={range.id}
+            type="button"
+            className={range.id === rangeId ? "active" : ""}
+            onClick={() => onRangeChange(range.id)}
+          >
+            {range.label}
+          </button>
+        ))}
       </div>
 
       <div className="stats-grid">

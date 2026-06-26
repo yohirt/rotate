@@ -78,6 +78,7 @@ html[data-theme="dark"] .app-footer-actions button,
 html[data-theme="dark"] .meta span,
 html[data-theme="dark"] .timer-section,
 html[data-theme="dark"] .time-adjust-actions button,
+html[data-theme="dark"] .stats-range-tabs button,
 html[data-theme="dark"] .stat-box,
 html[data-theme="dark"] .stats-task-row,
 html[data-theme="dark"] .hidden-task-list button,
@@ -123,7 +124,9 @@ html[data-theme="dark"] .top-menu button {
 
 html[data-theme="dark"] .top-menu button.active,
 html[data-theme="dark"] .top-menu button:hover,
-html[data-theme="dark"] .top-menu .theme-toggle-nav[aria-pressed="true"] {
+html[data-theme="dark"] .top-menu .theme-toggle-nav[aria-pressed="true"],
+html[data-theme="dark"] .stats-range-tabs button.active,
+html[data-theme="dark"] .stats-range-tabs button:hover {
   background:
     linear-gradient(135deg, rgba(134, 244, 216, 0.18), rgba(187, 167, 255, 0.13));
   color: #dffdf9;

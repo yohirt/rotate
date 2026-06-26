@@ -1452,6 +1452,32 @@ button {
   padding: 8px 13px;
 }
 
+.stats-range-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: -6px 0 18px;
+}
+
+.stats-range-tabs button {
+  min-height: 34px;
+  border: 1px solid rgba(202, 221, 239, 0.9);
+  border-radius: 999px;
+  background: rgba(248, 251, 255, 0.9);
+  color: #35516e;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 900;
+  padding: 7px 11px;
+}
+
+.stats-range-tabs button:hover,
+.stats-range-tabs button.active {
+  border-color: rgba(35, 196, 186, 0.42);
+  background: rgba(235, 255, 252, 0.94);
+  color: #0f766e;
+}
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

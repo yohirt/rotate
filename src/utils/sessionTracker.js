@@ -10,6 +10,117 @@ const getLocalDateKey = (date) => {
   return `${year}-${month}-${day}`;
 };
 
+export const STATS_RANGE_OPTIONS = [
+  { id: "cycle", label: "Cykl", days: null },
+  { id: "3d", label: "3 dni", days: 3 },
+  { id: "7d", label: "Tydzień", days: 7 },
+  { id: "14d", label: "2 tyg.", days: 14 },
+  { id: "30d", label: "Miesiąc", days: 30 },
+  { id: "90d", label: "Kwartał", days: 90 },
+  { id: "365d", label: "Rok", days: 365 },
+];
+
+const getStartOfLocalDay = (date) =>
+  new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+export const getStatsRangeOption = (rangeId) =>
+  STATS_RANGE_OPTIONS.find((range) => range.id === rangeId) ??
+  STATS_RANGE_OPTIONS[0];
+
+export const getStatsRangeStart = (rangeId, now = new Date()) => {
+  const range = getStatsRangeOption(rangeId);
+  if (!range.days) {
+    return null;
+  }
+
+  const start = getStartOfLocalDay(now);
+  start.setDate(start.getDate() - range.days + 1);
+  return start;
+};
+
+export const getStatsRangeDayCount = (rangeId) =>
+  getStatsRangeOption(rangeId).days ?? 1;
+
+export const getSessionStartTime = (session) => {
+  if (session?.startTime) {
+    const parsedStart = new Date(session.startTime);
+    if (!Number.isNaN(parsedStart.getTime())) {
+      return parsedStart;
+    }
+  }
+
+  if (session?.date) {
+    const parsedDate = new Date(`${session.date}T00:00:00`);
+    if (!Number.isNaN(parsedDate.getTime())) {
+      return parsedDate;
+    }
+  }
+
+  return null;
+};
+
+export const getSessionDurationSeconds = (session) => {
+  if (typeof session?.durationSeconds === "number") {
+    return session.durationSeconds;
+  }
+
+  if (typeof session?.duration === "number") {
+    return session.duration * 60;
+  }
+
+  return 0;
+};
+
+export const isSessionInStatsRange = (session, rangeStart, rangeEnd = new Date()) => {
+  if (!rangeStart) {
+    return true;
+  }
+
+  const sessionStartTime = getSessionStartTime(session);
+  if (!sessionStartTime) {
+    return false;
+  }
+
+  return sessionStartTime >= rangeStart && sessionStartTime <= rangeEnd;
+};
+
+export const getRangeDuration = (
+  task,
+  rangeStart,
+  rangeEnd = new Date(),
+  subtaskId = undefined
+) => {
+  const totalSeconds = (task.sessions || [])
+    .filter((session) => {
+      const matchesSubtask =
+        subtaskId === undefined ? true : session.subtaskId === subtaskId;
+      return (
+        matchesSubtask &&
+        isSessionInStatsRange(session, rangeStart, rangeEnd)
+      );
+    })
+    .reduce(
+      (total, session) => total + getSessionDurationSeconds(session),
+      0
+    );
+
+  return Math.max(0, totalSeconds);
+};
+
+export const getRangeSessions = (tasks, rangeStart, rangeEnd = new Date()) =>
+  tasks
+    .flatMap((task) =>
+      (task.sessions || [])
+        .filter((session) => isSessionInStatsRange(session, rangeStart, rangeEnd))
+        .map((session) => ({
+          ...session,
+          taskId: task.id,
+          taskTitle: task.title,
+          taskIcon: task.icon,
+        }))
+    )
+    .sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
+
 /**
  * Oblicza czas trwania sesji w minutach
  * @param {Date} startTime - czas rozpoczęcia

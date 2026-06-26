@@ -24,6 +24,11 @@ import {
   addSessionToTask,
   getTargetSeconds,
   getTimeProgressPercent,
+  getStatsRangeDayCount,
+  getStatsRangeOption,
+  getStatsRangeStart,
+  getRangeDuration,
+  getRangeSessions,
   formatDuration,
 } from "./utils/sessionTracker";
 import "./App.css";
@@ -331,6 +336,7 @@ function App() {
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [newTaskForm, setNewTaskForm] = useState(emptyTaskForm);
   const [activeView, setActiveView] = useState(bootstrap.initialActiveView);
+  const [statsRangeId, setStatsRangeId] = useState("cycle");
   const [runningSession, setRunningSession] = useState(
     bootstrap.initialRunningSession
   );
@@ -852,6 +858,96 @@ function App() {
         ? getTimeProgressPercent(totalProgressSeconds, totalTargetSeconds)
         : 0,
   };
+  const statsRangeOption = getStatsRangeOption(statsRangeId);
+  const statsRangeStart =
+    statsRangeId === "cycle"
+      ? cycleStartTime
+      : getStatsRangeStart(statsRangeId, currentTime);
+  const statsRangeDayCount =
+    statsRangeId === "cycle" ? 1 : getStatsRangeDayCount(statsRangeId);
+  const getTaskSpentInStatsRange = (task) => {
+    const savedSeconds =
+      statsRangeId === "cycle"
+        ? getCycleDuration(task, cycleStartTime)
+        : getRangeDuration(task, statsRangeStart, currentTime);
+    const runningSeconds =
+      statsRangeId === "cycle"
+        ? getRunningSessionElapsedInCycle(task)
+        : runningSession?.taskId === task.id
+        ? calculateElapsedSeconds(
+            new Date(
+              Math.max(
+                new Date(runningSession.startTime).getTime(),
+                statsRangeStart?.getTime() ?? 0
+              )
+            ),
+            currentTime
+          )
+        : 0;
+
+    return savedSeconds + runningSeconds;
+  };
+  const statsRangeTaskStats = visibleTasks
+    .map((task) => {
+      const spentSeconds = getTaskSpentInStatsRange(task);
+      const targetSeconds = getTargetSeconds(task) * statsRangeDayCount;
+
+      return {
+        id: task.id,
+        title: task.title,
+        icon: task.icon,
+        spentSeconds,
+        targetSeconds,
+        percent: getTimeProgressPercent(spentSeconds, targetSeconds),
+      };
+    })
+    .sort((a, b) => b.spentSeconds - a.spentSeconds);
+  const statsRangeTargetSeconds = statsRangeTaskStats.reduce(
+    (sum, task) => sum + task.targetSeconds,
+    0
+  );
+  const statsRangeSpentSeconds = statsRangeTaskStats.reduce(
+    (sum, task) => sum + task.spentSeconds,
+    0
+  );
+  const statsRangeProgressSeconds = statsRangeTaskStats.reduce(
+    (sum, task) => sum + Math.min(task.spentSeconds, task.targetSeconds),
+    0
+  );
+  const statsRangeRemainingSeconds = statsRangeTaskStats.reduce(
+    (sum, task) =>
+      sum + Math.max(task.targetSeconds - task.spentSeconds, 0),
+    0
+  );
+  const statsRangeOverTargetSeconds = statsRangeTaskStats.reduce(
+    (sum, task) =>
+      sum + Math.max(task.spentSeconds - task.targetSeconds, 0),
+    0
+  );
+  const statsRangeSessionCount =
+    (statsRangeId === "cycle"
+      ? getCycleSessions(visibleTasks, cycleStartTime).length
+      : getRangeSessions(visibleTasks, statsRangeStart, currentTime).length) +
+    (runningSession ? 1 : 0);
+  const displayedStats =
+    statsRangeId === "cycle"
+      ? stats
+      : {
+          spentSeconds: statsRangeSpentSeconds,
+          targetSeconds: statsRangeTargetSeconds,
+          remainingSeconds: statsRangeRemainingSeconds,
+          overTargetSeconds: statsRangeOverTargetSeconds,
+          sessionCount: statsRangeSessionCount,
+          progressPercent:
+            statsRangeTargetSeconds > 0
+              ? getTimeProgressPercent(
+                  statsRangeProgressSeconds,
+                  statsRangeTargetSeconds
+                )
+              : 0,
+        };
+  const displayedTaskStats =
+    statsRangeId === "cycle" ? taskStats : statsRangeTaskStats;
   const dailyTotalSaved = visibleTasks.reduce(
     (sum, task) => sum + getCycleDuration(task, cycleStartTime),
     0
@@ -1647,8 +1743,11 @@ function App() {
         )}
         {activeView === "stats" && (
           <StatsPanel
-            stats={stats}
-            taskStats={taskStats}
+            stats={displayedStats}
+            taskStats={displayedTaskStats}
+            rangeId={statsRangeId}
+            rangeLabel={statsRangeOption.label}
+            onRangeChange={setStatsRangeId}
             completedTasks={completedTasks}
             visibleTaskCount={visibleTasks.length}
             hiddenTaskCount={hiddenTasks.length}
