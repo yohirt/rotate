@@ -3,6 +3,7 @@ import TaskPanel from "./components/TaskPanel";
 import StatsPanel from "./components/StatsPanel";
 import TaskWheel from "./components/TaskWheel";
 import SubtaskWheel from "./components/SubtaskWheel";
+import AuthPanel from "./components/AuthPanel";
 import { initialTasks } from "./data/initialTasks";
 import { ICON_OPTIONS } from "./data/taskIcons";
 import {
@@ -1423,6 +1424,7 @@ function App() {
 
           <div className="topbar-actions">
             <span>📅 {headerDate} · {headerTime}</span>
+            <AuthPanel />
             <span>📅 Środa, 22 maja</span>
             <button>🔔</button>
             <button>⋮</button>

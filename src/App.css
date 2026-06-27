@@ -212,6 +212,200 @@ button {
   white-space: nowrap;
 }
 
+.auth-panel {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.topbar-actions .auth-panel-toggle,
+.topbar-actions .auth-panel-popover button {
+  min-width: 0;
+  min-height: 0;
+}
+
+.topbar-actions .auth-panel-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 40px;
+  border: 1px solid rgba(220, 231, 243, 0.9);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  color: #174f9f;
+  box-shadow: 0 8px 18px rgba(25, 72, 122, 0.07);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 850;
+  padding: 8px 13px;
+  white-space: nowrap;
+}
+
+.auth-panel-popover {
+  position: absolute;
+  z-index: 80;
+  top: calc(100% + 10px);
+  right: 0;
+  width: min(330px, calc(100vw - 28px));
+  border: 1px solid rgba(220, 231, 243, 0.95);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 22px 70px rgba(31, 73, 125, 0.2);
+  padding: 14px;
+  text-align: left;
+  backdrop-filter: blur(18px);
+}
+
+.auth-panel-header,
+.auth-panel-mode,
+.auth-panel-account,
+.auth-panel-form {
+  display: flex;
+}
+
+.auth-panel-header {
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.topbar-actions .auth-panel-header button {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(220, 231, 243, 0.9);
+  border-radius: 999px;
+  background: rgba(244, 248, 252, 0.9);
+  color: #36516f;
+  box-shadow: none;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  padding: 0;
+}
+
+.auth-panel-note,
+.auth-panel-status,
+.auth-panel-error {
+  margin: 0;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 1.45;
+  padding: 10px 12px;
+}
+
+.auth-panel-note {
+  background: rgba(226, 239, 252, 0.78);
+  color: #3c5876;
+}
+
+.auth-panel-status {
+  margin-top: 10px;
+  background: rgba(35, 196, 186, 0.13);
+  color: #0d766f;
+}
+
+.auth-panel-error {
+  margin-top: 10px;
+  background: rgba(220, 38, 38, 0.1);
+  color: #b91c1c;
+}
+
+.auth-panel-form,
+.auth-panel-account {
+  flex-direction: column;
+  gap: 10px;
+}
+
+.auth-panel-account span,
+.auth-panel-form label span {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.auth-panel-account strong {
+  overflow-wrap: anywhere;
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.auth-panel-mode {
+  gap: 6px;
+  padding: 4px;
+  border: 1px solid rgba(220, 231, 243, 0.9);
+  border-radius: 15px;
+  background: rgba(241, 247, 252, 0.85);
+}
+
+.topbar-actions .auth-panel-mode button {
+  flex: 1;
+  min-height: 32px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: #64748b;
+  box-shadow: none;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 850;
+  padding: 7px 10px;
+}
+
+.topbar-actions .auth-panel-mode button.active {
+  background: #ffffff;
+  color: #174f9f;
+  box-shadow: 0 8px 18px rgba(25, 72, 122, 0.08);
+}
+
+.auth-panel-form label {
+  display: grid;
+  gap: 6px;
+}
+
+.auth-panel-form input {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid rgba(205, 220, 236, 0.95);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 750;
+  outline: none;
+  padding: 9px 11px;
+}
+
+.auth-panel-form input:focus {
+  border-color: rgba(35, 196, 186, 0.9);
+  box-shadow: 0 0 0 3px rgba(35, 196, 186, 0.16);
+}
+
+.topbar-actions .auth-panel-submit {
+  min-height: 42px;
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--blue), var(--teal));
+  color: #ffffff;
+  box-shadow: 0 12px 28px rgba(35, 119, 230, 0.2);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 900;
+  padding: 10px 14px;
+}
+
+.topbar-actions .auth-panel-submit:disabled {
+  cursor: progress;
+  opacity: 0.68;
+}
+
 .top-menu {
   position: sticky;
   z-index: 30;
@@ -2397,8 +2591,23 @@ button {
     padding: 7px 10px;
   }
 
-  .topbar-actions button:not(.install-button):not(.pwa-refresh-button) {
+  .topbar-actions > button:not(.install-button):not(.pwa-refresh-button) {
     display: none;
+  }
+
+  .auth-panel {
+    flex: 0 0 auto;
+  }
+
+  .topbar-actions .auth-panel-toggle {
+    min-height: 34px;
+    font-size: 12px;
+    padding: 7px 10px;
+  }
+
+  .auth-panel-popover {
+    right: auto;
+    left: 0;
   }
 
   .content {
